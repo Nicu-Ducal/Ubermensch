@@ -10,4 +10,8 @@ public class BankApp {
             bank = new BankApp();
         return bank;
     }
+
+    public void run() {
+
+    }
 }
