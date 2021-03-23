@@ -13,6 +13,10 @@ public class ClientService {
         this.currentClient = null;
     }
 
+    public Client getCurrentClient() {
+        return currentClient;
+    }
+
     public Boolean LogIn(String username, String password) {
         for (Client cl: clientList) {
             if (cl.getUsername().equals(username) && cl.checkPassword(password)) {
@@ -31,5 +35,11 @@ public class ClientService {
         return false;
     }
 
-    
+    public void printClientInfo() {
+        if (currentClient != null) {
+            System.out.println(currentClient.toString());
+        } else {
+            System.out.println("Trebuie sa va logati mai intai pentru a afisa informatii");
+        }
+    }
 }

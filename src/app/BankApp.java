@@ -2,21 +2,24 @@ package app;
 
 import features.Account;
 import features.Currency;
+import services.AccountService;
+import services.ClientService;
+import services.CurrencyService;
 import users.Client;
-import users.Person;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class BankApp {
     private static BankApp bank = null;
-    private List<Person> clientList;
-    private List<Person> employeeList;
+    ClientService clientService;
+    AccountService accountService;
+    CurrencyService currencyService;
     Boolean running;
 
     private BankApp() {
-        clientList = new ArrayList<>();
-        employeeList = new ArrayList<>();
+        clientService = new ClientService(new ArrayList<Client>());
+        accountService = new AccountService();
+        currencyService = new CurrencyService(new ArrayList<Currency>());
         Boolean running = true;
     }
 

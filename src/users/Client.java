@@ -15,12 +15,25 @@ public class Client extends Person {
     private SortedSet<Deposit> deposits;
     private SortedSet<Credit> credits;
 
+
     public Client(int id, String username, String password, String name, String email, String clientType) {
         super(id, username, password, name, email);
         this.clientType = clientType;
         this.accounts = new ArrayList<>();
         this.deposits = new TreeSet<>();
         this.credits = new TreeSet<>();
+    }
+
+    public List<Account> getAccounts() {
+        return accounts;
+    }
+
+    public SortedSet<Deposit> getDeposits() {
+        return deposits;
+    }
+
+    public SortedSet<Credit> getCredits() {
+        return credits;
     }
 
     @Override

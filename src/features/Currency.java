@@ -16,4 +16,8 @@ public class Currency {
     public String getInternational() {
         return this.international;
     }
+
+    public String getFullName() {
+        return name + "(" + international + ")";
+    }
 }
