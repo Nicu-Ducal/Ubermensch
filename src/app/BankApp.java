@@ -2,9 +2,7 @@ package app;
 
 import features.Account;
 import features.Currency;
-import services.AccountService;
-import services.ClientService;
-import services.CurrencyService;
+import services.*;
 import users.Client;
 
 import java.util.ArrayList;
@@ -14,6 +12,8 @@ public class BankApp {
     ClientService clientService;
     AccountService accountService;
     CurrencyService currencyService;
+    DepositService depositService;
+    CreditService creditService;
     Boolean running;
 
     private BankApp() {

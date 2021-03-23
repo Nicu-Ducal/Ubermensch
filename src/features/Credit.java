@@ -77,6 +77,7 @@ public class Credit extends Contract implements Comparable<Credit> {
         // Tranzactii
     }
 
+    // TODO: Sa schimb aici functia poate?
     public void payCredit(Double amount) {
         sumaRestituita += amount;
     }

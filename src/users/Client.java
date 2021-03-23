@@ -6,33 +6,31 @@ import features.Deposit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 public class Client extends Person {
     private String clientType;
     private List<Account> accounts;
-    private SortedSet<Deposit> deposits;
-    private SortedSet<Credit> credits;
+    private List<Deposit> deposits;
+    private List<Credit> credits;
 
 
     public Client(int id, String username, String password, String name, String email, String clientType) {
         super(id, username, password, name, email);
         this.clientType = clientType;
         this.accounts = new ArrayList<>();
-        this.deposits = new TreeSet<>();
-        this.credits = new TreeSet<>();
+        this.deposits = new ArrayList<>();
+        this.credits = new ArrayList<>();
     }
 
     public List<Account> getAccounts() {
         return accounts;
     }
 
-    public SortedSet<Deposit> getDeposits() {
+    public List<Deposit> getDeposits() {
         return deposits;
     }
 
-    public SortedSet<Credit> getCredits() {
+    public List<Credit> getCredits() {
         return credits;
     }
 

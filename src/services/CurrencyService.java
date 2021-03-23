@@ -6,9 +6,9 @@ import features.interfaces.Numeric;
 import java.util.List;
 import java.util.Scanner;
 
-public class CurrencyService implements Numeric {
-    private List<Currency> currencies;
-    // TODO: Add ExchangeCurrencies
+public class CurrencyService {
+    private final List<Currency> currencies;
+    // TODO: Add ExchangeCurrencies Set or Map
 
     public CurrencyService(List<Currency> currencies) {
         this.currencies = currencies;

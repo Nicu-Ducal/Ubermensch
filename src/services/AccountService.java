@@ -14,6 +14,7 @@ public class AccountService {
 
     public AccountService() {
         clientAccounts = null;
+        selectedAccount = null;
     }
 
     public void setClientAccounts(Client client) throws Exception {
