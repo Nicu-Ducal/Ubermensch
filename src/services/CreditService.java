@@ -31,7 +31,7 @@ public class CreditService {
         else System.out.println("Selectati un cont pentru a afisa extrasul");
     }
 
-    public void addMoney(Double amount) {
+    public void addMoneyToCredit(Double amount) {
         if (selectedCredit != null) selectedCredit.payCredit(amount);
         else System.out.println("Selectati un cont pentru a putea adauga bani pe el");
     }
