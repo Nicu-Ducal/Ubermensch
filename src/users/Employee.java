@@ -8,7 +8,10 @@ public class Employee extends Person {
         this.job = job;
     }
 
-    public void signContract() {
-
+    @Override
+    public String toString() {
+        return ("Informatii despre clientul " + name + ":\n"
+                + "Username: " + username + "\nEmail: " + email
+                + "\nJob: " + job + "\n");
     }
 }

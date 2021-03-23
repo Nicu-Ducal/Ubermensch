@@ -1,12 +1,12 @@
 package features;
 
-import features.interfaces.Rate;
 import users.Client;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
-public class Credit extends Contract implements Rate {
+public class Credit extends Contract implements Comparable<Credit> {
     private Double sumaImprumutata;
     private Double sumaRestituita;
     private Double sumaDeRestituit;
@@ -41,6 +41,27 @@ public class Credit extends Contract implements Rate {
 
     public LocalDateTime getClosingDate() {
         return closingDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Credit)) return false;
+        if (!super.equals(o)) return false;
+        Credit credit = (Credit) o;
+        return sumaImprumutata.equals(credit.sumaImprumutata) && sumaRestituita.equals(credit.sumaRestituita) && sumaDeRestituit.equals(credit.sumaDeRestituit) && closingDate.equals(credit.closingDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), sumaImprumutata, sumaRestituita, sumaDeRestituit, closingDate);
+    }
+
+    @Override
+    public int compareTo(Credit o) {
+        if (sumaDeRestituit.equals(o.getSumaDeRestituit())) return 0;
+        else if (sumaDeRestituit > o.getSumaDeRestituit()) return -1;
+        return 1;
     }
 
     @Override

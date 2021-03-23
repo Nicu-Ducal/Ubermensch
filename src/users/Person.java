@@ -43,5 +43,10 @@ public abstract class Person {
         this.email = email;
     }
 
-    public abstract void signContract();
+    public Boolean checkPassword(String password) {
+        return this.password.equals(password);
+    }
+
+    public abstract String toString();
+
 }

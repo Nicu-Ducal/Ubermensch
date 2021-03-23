@@ -1,12 +1,12 @@
 package features;
 
-import features.interfaces.Rate;
 import users.Client;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
-public class Deposit extends Contract implements Rate {
+public class Deposit extends Contract implements Comparable<Deposit> {
     private LocalDateTime expirationDate;
     private Double sumaDepusa;
 
@@ -22,6 +22,27 @@ public class Deposit extends Contract implements Rate {
 
     public LocalDateTime getExpirationDate() {
         return expirationDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Deposit)) return false;
+        if (!super.equals(o)) return false;
+        Deposit deposit = (Deposit) o;
+        return expirationDate.equals(deposit.expirationDate) && sumaDepusa.equals(deposit.sumaDepusa);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), expirationDate, sumaDepusa);
+    }
+
+    @Override
+    public int compareTo(Deposit o) {
+        if (sumaDepusa.equals(o.getSumaDepusa())) return expirationDate.compareTo(o.getExpirationDate());
+        else if (sumaDepusa > o.getSumaDepusa()) return -1;
+        return 1;
     }
 
     @Override

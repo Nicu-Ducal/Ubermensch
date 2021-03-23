@@ -3,11 +3,22 @@ package app;
 import features.Account;
 import features.Currency;
 import users.Client;
+import users.Person;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BankApp {
     private static BankApp bank = null;
+    private List<Person> clientList;
+    private List<Person> employeeList;
+    Boolean running;
 
-    private BankApp() {}
+    private BankApp() {
+        clientList = new ArrayList<>();
+        employeeList = new ArrayList<>();
+        Boolean running = true;
+    }
 
     public static BankApp getInstance() {
         if (bank == null)
