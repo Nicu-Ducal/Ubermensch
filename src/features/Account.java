@@ -37,7 +37,6 @@ public class Account {
         return balance;
     }
 
-    // Sa fac exceptie?
     public void withdrawMoney(Double amount) throws Exception {
         if (amount > balance) {
             throw new Exception("Not enough money on your account");
@@ -45,9 +44,13 @@ public class Account {
         balance -= amount;
     }
 
-    // Tranzactii
     public void addMoney(Double amount) {
         balance += amount;
+    }
+
+    @Override
+    public String toString() {
+        return "Cont bancar, client: " + client.getName() + ", valuta: " + accountCurrency.getFullName();
     }
 
     public void extrasDeCont() {

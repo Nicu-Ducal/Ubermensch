@@ -38,6 +38,9 @@ public class Client extends Person {
     public String toString() {
         return ("Informatii despre clientul " + name + ":\n"
                 + "Username: " + username + "\nEmail: " + email
-                + "\nTip client: " + clientType + "\n");
+                + "\nTip client: " + clientType
+                + "\nNumarul de conturi bancare deschise: " + accounts.size()
+                + "\nNumarul de depozite bancare deschise: " + deposits.size()
+                + "\nNumarul de credite bancare deschise: " + credits.size());
     }
 }
