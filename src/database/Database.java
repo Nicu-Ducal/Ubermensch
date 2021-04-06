@@ -1,10 +1,11 @@
 package database;
 
+import features.Currency;
 import users.Client;
 import users.Employee;
-import features.Currency;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Database {
@@ -34,6 +35,22 @@ public class Database {
         db.add(new Currency("Euro", "EUR"));
         db.add(new Currency("Dolari", "USD"));
         db.add(new Currency("Lire Sterline", "GBP"));
+        return db;
+    }
+
+    public HashMap<String, Double> createDepositDobanda() {
+        HashMap<String, Double> db = new HashMap<>();
+        db.put("Lunar", 2.0);
+        db.put("Anual", 5.0);
+        db.put("Cincinal", 10.0);
+        return db;
+    }
+
+    public HashMap<String, Double> createCreditDobanda() {
+        HashMap<String, Double> db = new HashMap<>();
+        db.put("Lunar", 2.0);
+        db.put("Anual", 15.0);
+        db.put("Cincinal", 40.0);
         return db;
     }
 }

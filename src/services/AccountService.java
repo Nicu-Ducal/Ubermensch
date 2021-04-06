@@ -12,10 +12,12 @@ public class AccountService {
     private List<Account> clientAccounts;
     private Account selectedAccount;
     private static Scanner scan = new Scanner(System.in);
+    private final int ACCOUNTS_LIMIT = 10;
+    public final Double MAX_ACCOUNT_BALANCE = 1000000.0;
+
 
     public AccountService() {
-        clientAccounts = null;
-        selectedAccount = null;
+        setNull();
     }
 
     public void setClientAccounts(Client client) throws Exception {
@@ -62,27 +64,13 @@ public class AccountService {
         }
         String line;
         int accountsNumber = clientAccounts.size();
-        if (accountsNumber > 10) {
+        if (accountsNumber > ACCOUNTS_LIMIT) {
             throw new Exception("Aveti deja limita admisibila de conturi deschise. Inchideti unele din cele curente pentru a deschide unul nou");
         }
         Currency currency = crs.selectCurrency();
-        System.out.println("Introduceti suma de bani: ");
-        Double balance = 0.0;
-        while (true) {
-            line = scan.nextLine();
-            if (Numeric.isNumeric(line)) {
-                balance = Double.parseDouble(line);
-                if (balance > 1000000.0) {
-                    System.out.println("Suma introdusa depaseste limita admisibila");
-                } else if (balance < 0.0) {
-                    System.out.println("Valoarea introdusa este una negativa. Introduceti o valoare pozitiva");
-                } else {
-                    break;
-                }
-            }
-            else
-                System.out.println("Introduceti o valoare numerica pozitiva");
-        }
+        System.out.print("Introduceti suma de bani: ");
+        Double balance = Numeric.getBalance(scan, MAX_ACCOUNT_BALANCE);
+
         Account newAccount = new Account(cls.getCurrentClient(), currency, balance);
         clientAccounts.add(newAccount);
         System.out.println("Operatiune realizata cu succes. Doriti sa fie eliberat si un card bancar pentru contul creat? (y/n)");
@@ -98,6 +86,19 @@ public class AccountService {
                 System.out.println("Introduceti un raspuns valid: y/n");
             }
         }
+    }
+
+    public void closeAccount() {
+        if (clientAccounts == null) {
+            System.out.println("Trebuie sa fiti logat si sa aveti un cont selectat pentru a-l sterge");
+            return;
+        }
+        if (selectedAccount == null) {
+            System.out.println("Selectati un cont pentru a-l sterge");
+            return;
+        }
+        clientAccounts.remove(selectedAccount);
+        System.out.println("Contul a fost sters cu succes");
     }
 
     public void showAccountsInfo() {

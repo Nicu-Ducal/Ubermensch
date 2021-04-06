@@ -28,7 +28,7 @@ public class ClientService {
         return currentClient;
     }
 
-    public void LogIn(AccountService as) {
+    public void LogIn(AccountService as, DepositService ds, CreditService cs) {
         if (currentClient != null) {
             System.out.println("You are already logged in with an account");
             return;
@@ -42,6 +42,8 @@ public class ClientService {
                 currentClient = cl;
                 try {
                     as.setClientAccounts(cl);
+                    ds.setClientDeposits(cl);
+                    cs.setClientCredits(cl);
                     System.out.println("V-ati logat cu succes");
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -52,10 +54,12 @@ public class ClientService {
         System.out.println("Nu exista nici un client cu aceasta combinatie de username si parola");
     }
 
-    public void LogOut(AccountService as) {
+    public void LogOut(AccountService as, DepositService ds, CreditService cs) {
         if (currentClient != null) {
             currentClient = null;
             as.setNull();
+            ds.setNull();
+            cs.setNull();
             System.out.println("V-ati deconectat cu succes");
         } else
             System.out.println("You are not signed in to log out");
