@@ -1,5 +1,7 @@
 package features;
 
+import java.util.HashMap;
+
 public class Currency {
     private final String name;
     private final String international;

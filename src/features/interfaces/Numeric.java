@@ -1,6 +1,7 @@
 package features.interfaces;
 
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 public interface Numeric {
     static Boolean isNumeric(String num) {
@@ -40,5 +41,13 @@ public interface Numeric {
             else
                 System.out.println("Introduceti o valoare numerica pozitiva");
         }
+    }
+
+    static Long RandomNumber(Long MIN_VALUE, Long MAX_VALUE) {
+        return ThreadLocalRandom.current().nextLong(MIN_VALUE, MAX_VALUE + 1);
+    }
+
+    static Integer RandomNumber(Integer MIN_VALUE, Integer MAX_VALUE) {
+        return ThreadLocalRandom.current().nextInt(MIN_VALUE, MAX_VALUE + 1);
     }
 }

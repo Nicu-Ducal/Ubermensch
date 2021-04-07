@@ -26,7 +26,7 @@ public class BankApp {
         Database db = new Database();
         clientService = new ClientService(db.createClients());
         accountService = new AccountService();
-        currencyService = new CurrencyService(db.createCurrencies());
+        currencyService = new CurrencyService(db.createCurrencies(), db.createExchanges());
         depositService = new DepositService(db.createDepositDobanda());
         creditService = new CreditService(db.createCreditDobanda());
         running = true;
@@ -118,12 +118,14 @@ public class BankApp {
             depositService.informatiiDepozit();
         } else if (cmd.equals("show-credit-info")) {
             creditService.informatiiCredit();
-        } else if (cmd.startsWith("add-money") && cmd.split(" ")[0].equals("add-money")) {
+        } else if (cmd.startsWith("add-money") && cmd.split(" ")[0].equals("add-money") && cmd.split(" ").length == 3) {
             String amount = cmd.split(" ")[1];
-            accountService.addBalance(amount);
-        } else if (cmd.startsWith("withdraw-money") && cmd.split(" ")[0].equals("withdraw-money")) {
+            String valuta = cmd.split(" ")[2];
+            accountService.addBalance(amount, valuta, currencyService);
+        } else if (cmd.startsWith("withdraw-money") && cmd.split(" ")[0].equals("withdraw-money") && cmd.split(" ").length == 3) {
             String amount = cmd.split(" ")[1];
-            accountService.withdrawBalance(amount);
+            String valuta = cmd.split(" ")[2];
+            accountService.withdrawBalance(amount, valuta, currencyService);
         } else if (cmd.equals("play-theme")) {
             music = playMusic();
         } else if (cmd.equals("stop-theme")) {

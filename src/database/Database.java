@@ -1,6 +1,7 @@
 package database;
 
 import features.Currency;
+import features.ExchangeCurrency;
 import users.Client;
 import users.Employee;
 
@@ -35,6 +36,16 @@ public class Database {
         db.add(new Currency("Euro", "EUR"));
         db.add(new Currency("Dolari", "USD"));
         db.add(new Currency("Lire Sterline", "GBP"));
+        return db;
+    }
+
+    public HashMap<ExchangeCurrency, Double> createExchanges() {
+        HashMap<ExchangeCurrency, Double> db = new HashMap<>();
+        List<Currency> currencies = createCurrencies();
+        Currency euro = currencies.get(1);
+        db.put(new ExchangeCurrency(euro, currencies.get(0)), 4.85);
+        db.put(new ExchangeCurrency(euro, currencies.get(2)), 1.19);
+        db.put(new ExchangeCurrency(euro, currencies.get(3)), 0.86);
         return db;
     }
 

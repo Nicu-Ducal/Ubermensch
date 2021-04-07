@@ -122,34 +122,52 @@ public class AccountService {
         else System.out.println("Selectati un cont pentru a afisa extrasul");
     }
 
-    public void addBalance(String amount) {
+    public void addBalance(String amount, String currency, CurrencyService crs) {
         if (clientAccounts == null) {
             System.out.println("Trebuie sa va logati mai intai pentru a efectua aceasta operatie");
             return;
         }
         if (selectedAccount != null) {
+            Currency cr = crs.getCurrency(currency);
+            if (cr == null) {
+                System.out.println("Valuta introdusa de dvs. nu exista");
+                return;
+            }
             if (Numeric.isNumeric(amount) && Double.parseDouble(amount) > 0.0) {
-                Double mamount = Double.parseDouble(amount);
-                selectedAccount.addMoney(mamount);
-                System.out.println("Contul dvs. a fost suplinit cu " + mamount + " " + selectedAccount.getAccountCurrency().getName());
+                Double moneyAmount = Double.parseDouble(amount);
+                // Daca nu e valuta contului nostru, facem schimbul valutar
+                try {
+                    moneyAmount = crs.convert(moneyAmount, cr, selectedAccount.getAccountCurrency());
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    return;
+                }
+                selectedAccount.addMoney(moneyAmount);
+                System.out.println("Contul dvs. a fost suplinit cu " + moneyAmount + " " + selectedAccount.getAccountCurrency().getName());
             } else
                 System.out.println("Introduceti o valoare numerica pozitiva pentru suplinirea contului");
         }
         else System.out.println("Selectati un cont pentru a putea adauga bani pe el");
     }
 
-    public void withdrawBalance(String amount) {
+    public void withdrawBalance(String amount, String currency, CurrencyService crs) {
         if (clientAccounts == null) {
             System.out.println("Trebuie sa va logati mai intai pentru a efectua aceasta operatie");
             return;
         }
 
         if (selectedAccount != null) {
+            Currency cr = crs.getCurrency(currency);
+            if (cr == null) {
+                System.out.println("Valuta introdusa de dvs. nu exista");
+                return;
+            }
             if (Numeric.isNumeric(amount) && Double.parseDouble(amount) > 0.0) {
-                Double mamount = Double.parseDouble(amount);
+                Double moneyAmount = Double.parseDouble(amount);
                 try {
-                    selectedAccount.withdrawMoney(mamount);
-                    System.out.println("Ati retras de pe cont " + mamount + " " + selectedAccount.getAccountCurrency().getName());
+                    moneyAmount = crs.convert(moneyAmount, cr, selectedAccount.getAccountCurrency());
+                    selectedAccount.withdrawMoney(moneyAmount);
+                    System.out.println("Ati retras de pe cont " + moneyAmount + " " + selectedAccount.getAccountCurrency().getName());
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
