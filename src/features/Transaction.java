@@ -54,9 +54,9 @@ public class Transaction implements Comparable<Transaction> {
 
     @Override
     public int compareTo(Transaction o) {
-        if (this.transactionTime.equals(o.transactionTime)) return 1;
-        else if (this.transactionTime.isBefore(o.transactionTime)) return -1;
-        return 1;
+        if (this.transactionTime.equals(o.transactionTime)) return 0;
+        else if (this.transactionTime.isBefore(o.transactionTime)) return 1;
+        return -1;
     }
 
     @Override
