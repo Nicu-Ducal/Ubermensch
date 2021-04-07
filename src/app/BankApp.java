@@ -130,6 +130,8 @@ public class BankApp {
             accountService.withdrawBalance(amount, valuta, currencyService);
         } else if (cmd.equals("transfer-money")) {
             transactionService.makeTransaction(clientService, accountService, currencyService);
+        } else if (cmd.equals("show-transfers")) {
+            transactionService.printTransactions();
         } else if (cmd.equals("play-theme")) {
             music = playMusic();
         } else if (cmd.equals("stop-theme")) {

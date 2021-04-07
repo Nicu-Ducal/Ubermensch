@@ -3,11 +3,10 @@
 Aplicatie bancara realizata in Java, utilizand concepte de Programare Orientată pe Obiecte (OOP), design patterns și baze de date. Momentan este o aplicatie pentru consola, eventual as putea face upgrade la un GUI simplu.  
 
 ## TODO
-1. Să completez funcționalitățile claselor ```CreditService``` și ```DepositService```
-2. Sa adaug funcționalitate pentru ```Currency``` si ```ExchangeCurrency```
-3. Sa definesc tranzactiile
-4. Sa completez funcționalitatea clasei ```BankApp``` la rularea aplicatiei.
-
+1. Să definesc (sau nu) clasa ```Employee```
+2. Să completez funcționalitatea clasei ```BankApp``` la rularea aplicatiei.
+3. Să elimin unele redundanțe
+   
 ### Descrierea aplicației
 Utilizatorii aplicației pot fi clienți ai băncii sau angajații acesteia. Mai întâi, pentru a efectua
 careva operații, clienții sau angajații trebuie să se logheze cu contul lor, iar apoi în dependența
@@ -52,6 +51,8 @@ CreditService:
 private List<Account> accounts;
 private List<Deposit> deposits;
 private List<Credit> credits;
+private HashMap<ExchangeCurrency, Double> exchangeRates;
+private TreeSet<Transaction> transactions;
 ```
   3. Utilizarea moștenirii pentru crearea unor clase adiționale și utilizarea în cadrul colecțiilor
 ```java
