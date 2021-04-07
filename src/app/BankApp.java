@@ -19,6 +19,7 @@ public class BankApp {
     private CurrencyService currencyService;
     private DepositService depositService;
     private CreditService creditService;
+    private TransactionService transactionService;
     private Boolean running;
     private Clip music;
 
@@ -29,6 +30,7 @@ public class BankApp {
         currencyService = new CurrencyService(db.createCurrencies(), db.createExchanges());
         depositService = new DepositService(db.createDepositDobanda());
         creditService = new CreditService(db.createCreditDobanda());
+        transactionService = new TransactionService();
         running = true;
     }
 
@@ -66,9 +68,9 @@ public class BankApp {
             running = false;
             System.out.println("Thanks for using the app!");
         } else if (cmd.equals("login")) {
-            clientService.LogIn(accountService, depositService, creditService);
+            clientService.LogIn(accountService, depositService, creditService, transactionService);
         } else if (cmd.equals("logout")) {
-            clientService.LogOut(accountService, depositService, creditService);
+            clientService.LogOut(accountService, depositService, creditService, transactionService);
         } else if (cmd.equals("register")) {
             clientService.Register();
         } else if (cmd.equals("show-info")) {
@@ -126,6 +128,8 @@ public class BankApp {
             String amount = cmd.split(" ")[1];
             String valuta = cmd.split(" ")[2];
             accountService.withdrawBalance(amount, valuta, currencyService);
+        } else if (cmd.equals("transfer-money")) {
+            transactionService.makeTransaction(clientService, accountService, currencyService);
         } else if (cmd.equals("play-theme")) {
             music = playMusic();
         } else if (cmd.equals("stop-theme")) {

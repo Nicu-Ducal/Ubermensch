@@ -99,6 +99,7 @@ public class DepositService {
             return;
         }
         clientDeposits.remove(selectedDeposit);
+        selectedDeposit = null;
         System.out.println("Depositul a fost sters cu succes");
     }
 

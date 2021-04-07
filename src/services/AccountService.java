@@ -98,7 +98,12 @@ public class AccountService {
             return;
         }
         clientAccounts.remove(selectedAccount);
+        selectedAccount = null;
         System.out.println("Contul a fost sters cu succes");
+    }
+
+    public Account getSelectedAccount() {
+        return selectedAccount;
     }
 
     public void showAccountsInfo() {
@@ -176,5 +181,23 @@ public class AccountService {
             }
         }
         else System.out.println("Selectati un cont pentru a putea extrage bani de pe el");
+    }
+
+    public Account selectAccountFromClient(Client cl) {
+        List<Account> accounts = cl.getAccounts();
+        if (accounts.size() == 0) {
+            System.out.println("Clientul selectat nu are nici un cont bancar");
+            return null;
+        }
+
+        System.out.println("Selectati unul din conturile clientului " + cl.getName());
+        for (int i = 0; i < accounts.size(); i++)
+            System.out.println((i + 1) + ") Contul " + (i + 1) + ", Valuta: " + accounts.get(i).getAccountCurrency().getFullName());
+        while (true) {
+            int idx = scan.nextInt();
+            if (1 <= idx && idx <= accounts.size())
+                return accounts.get(idx - 1);
+            System.out.println("Introduceti un numar valid");
+        }
     }
 }

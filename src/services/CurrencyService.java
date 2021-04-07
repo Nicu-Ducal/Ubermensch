@@ -49,6 +49,8 @@ public class CurrencyService {
     }
 
     public Double convert(Double amount, Currency fromCurr, Currency toCurr) throws Exception {
+        if (fromCurr.equals(toCurr))
+            return amount;
         ExchangeCurrency excr1 = new ExchangeCurrency(fromCurr, toCurr);
         ExchangeCurrency excr2 = new ExchangeCurrency(toCurr, fromCurr);
         if (exchangeRates.containsKey(excr1))

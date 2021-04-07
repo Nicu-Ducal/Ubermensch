@@ -1,7 +1,9 @@
 package services;
 
 import users.Client;
+import users.Person;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -28,7 +30,7 @@ public class ClientService {
         return currentClient;
     }
 
-    public void LogIn(AccountService as, DepositService ds, CreditService cs) {
+    public void LogIn(AccountService as, DepositService ds, CreditService cs, TransactionService ts) {
         if (currentClient != null) {
             System.out.println("You are already logged in with an account");
             return;
@@ -44,6 +46,7 @@ public class ClientService {
                     as.setClientAccounts(cl);
                     ds.setClientDeposits(cl);
                     cs.setClientCredits(cl);
+                    ts.setTransactions(cl);
                     System.out.println("V-ati logat cu succes");
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -54,12 +57,13 @@ public class ClientService {
         System.out.println("Nu exista nici un client cu aceasta combinatie de username si parola");
     }
 
-    public void LogOut(AccountService as, DepositService ds, CreditService cs) {
+    public void LogOut(AccountService as, DepositService ds, CreditService cs, TransactionService ts) {
         if (currentClient != null) {
             currentClient = null;
             as.setNull();
             ds.setNull();
             cs.setNull();
+            ts.setNull();
             System.out.println("V-ati deconectat cu succes");
         } else
             System.out.println("You are not signed in to log out");
@@ -111,6 +115,23 @@ public class ClientService {
             System.out.println(currentClient.toString());
         } else {
             System.out.println("Trebuie sa va logati mai intai pentru a afisa informatii");
+        }
+    }
+
+    public Client selectClientFromOthers() {
+        if (currentClient == null) {
+            System.out.println("Trebuie sa va logati pentru a efectua aceasta operatie");
+            return null;
+        }
+        List<Person> otherUsers = new ArrayList<>(clientList);
+        otherUsers.remove(currentClient);
+        for (int i = 0; i < otherUsers.size(); i++)
+            System.out.println((i + 1) + ") " + otherUsers.get(i).getName());
+        while (true) {
+            int idx = scan.nextInt();
+            if (1 <= idx && idx <= otherUsers.size())
+                return (Client) otherUsers.get(idx - 1);
+            System.out.println("Introduceti un numar valid");
         }
     }
 }

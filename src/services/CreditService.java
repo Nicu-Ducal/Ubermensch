@@ -106,6 +106,7 @@ public class CreditService {
             return;
         }
         clientCredits.remove(selectedCredit);
+        selectedCredit = null;
         System.out.println("Creditul a fost sters cu succes");
     }
 

@@ -1,6 +1,6 @@
 package features;
 
-import java.util.HashMap;
+import java.util.Objects;
 
 public class Currency {
     private final String name;
@@ -20,6 +20,19 @@ public class Currency {
     }
 
     public String getFullName() {
-        return name + "(" + international + ")";
+        return name + " (" + international + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Currency)) return false;
+        Currency currency = (Currency) o;
+        return name.equals(currency.name) && international.equals(currency.international);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, international);
     }
 }
