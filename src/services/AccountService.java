@@ -11,16 +11,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class AccountService implements IDatabaseOperations<Account> {
     private static AccountService accountServiceInstance = null;
+    private List<Account> accounts;
     private List<Account> clientAccounts;
     private Account selectedAccount;
     private static Scanner scan = new Scanner(System.in);
     private final int ACCOUNTS_LIMIT = 10;
     private final Double MAX_ACCOUNT_BALANCE = 1000000.0;
-    private Integer lastId = 0;
-
 
     private AccountService() {
         setNull();
@@ -83,8 +83,10 @@ public class AccountService implements IDatabaseOperations<Account> {
         System.out.print("Introduceti suma de bani: ");
         Double balance = Numeric.getBalance(scan, MAX_ACCOUNT_BALANCE);
 
-        Account newAccount = new Account(lastId++, cls.getCurrentClient(), currency, balance);
+        Integer id = accounts.size() == 0 ? 1 : accounts.get(accounts.size() - 1).getID() + 1;
+        Account newAccount = new Account(id, cls.getCurrentClient(), currency, balance);
         clientAccounts.add(newAccount);
+        accounts.add(newAccount);
         System.out.println("Operatiune realizata cu succes. Doriti sa fie eliberat si un card bancar pentru contul creat? (y/n)");
         while (true) {
             line = scan.nextLine();
@@ -110,6 +112,7 @@ public class AccountService implements IDatabaseOperations<Account> {
             return;
         }
         clientAccounts.remove(selectedAccount);
+        accounts.remove(selectedAccount);
         selectedAccount = null;
         System.out.println("Contul a fost sters cu succes");
     }
@@ -151,7 +154,7 @@ public class AccountService implements IDatabaseOperations<Account> {
                 return;
             }
             if (Numeric.isNumeric(amount) && Double.parseDouble(amount) > 0.0) {
-                Double moneyAmount = Double.parseDouble(amount);
+                Double moneyAmount = Numeric.RoundTwoDecimals(Double.parseDouble(amount));
                 // Daca nu e valuta contului nostru, facem schimbul valutar
                 try {
                     moneyAmount = crs.convert(moneyAmount, cr, selectedAccount.getAccountCurrency());
@@ -180,7 +183,7 @@ public class AccountService implements IDatabaseOperations<Account> {
                 return;
             }
             if (Numeric.isNumeric(amount) && Double.parseDouble(amount) > 0.0) {
-                Double moneyAmount = Double.parseDouble(amount);
+                Double moneyAmount = Numeric.RoundTwoDecimals(Double.parseDouble(amount));
                 try {
                     moneyAmount = crs.convert(moneyAmount, cr, selectedAccount.getAccountCurrency());
                     selectedAccount.withdrawMoney(moneyAmount);
@@ -216,20 +219,25 @@ public class AccountService implements IDatabaseOperations<Account> {
     /*
         Database related operations
      */
+
     @Override
-    public Account toObjectFromDB(String[] dbRow, Object... services) {
-        ClientService cls = null;
-        CurrencyService crs = null;
-        if (services[0] instanceof ClientService) cls = (ClientService) services[0];
-        if (services[1] instanceof CurrencyService) crs = (CurrencyService) services[1];
+    public List<Account> getCollection() { return accounts; }
+
+    @Override
+    public void load(List<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    @Override
+    public Account toObjectFromDB(String[] dbRow) {
         Integer id = Integer.parseInt(dbRow[0]);
         LocalDateTime creationDate = LocalDateTime.parse(dbRow[1]);
         Double balance = Double.parseDouble(dbRow[2]);
         Integer clientID = Integer.parseInt(dbRow[3]);
         Integer currencyID = Integer.parseInt(dbRow[4]);
         CreditCard creditCard = null;
-        Client client = cls.getElementById(clientID);
-        Currency currency = crs.getElementById(currencyID);
+        Client client = ClientService.getInstance().getElementById(clientID);
+        Currency currency = CurrencyService.getInstance().getElementById(currencyID);
         return new Account(id, creationDate, balance, client, currency, creditCard);
     }
 
@@ -252,9 +260,17 @@ public class AccountService implements IDatabaseOperations<Account> {
          exact ca si Just si Nothing
         */
         Optional<Account> maybeAccount =
-                clientAccounts.stream()
+                accounts.stream()
                         .filter(account -> account.getID().equals(id))
                         .findFirst();
         return maybeAccount.orElse(null);
+    }
+
+    public List<Account> getAccountsByClientId(Integer clientID) {
+        List<Account> clAccounts =
+                accounts.stream()
+                .filter(account -> account.getClient().getID().equals(clientID))
+                .collect(Collectors.toList());
+        return clAccounts;
     }
 }

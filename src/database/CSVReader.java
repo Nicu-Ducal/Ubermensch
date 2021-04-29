@@ -41,12 +41,12 @@ public class CSVReader {
         }
     }
 
-    public <T> List<T> readData(String path, IDatabaseOperations<T> service, Object... otherServices) throws Exception {
+    public <T> List<T> readData(String path, IDatabaseOperations<T> service) {
         try {
             List<String[]> fileContent = readFile(path);
             List<T> dbContent = new ArrayList<T>();
             for (String[] line: fileContent) {
-                T obj = service.toObjectFromDB(line, otherServices);
+                T obj = service.toObjectFromDB(line);
                 dbContent.add(obj);
             }
             return dbContent;

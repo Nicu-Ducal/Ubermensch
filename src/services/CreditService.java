@@ -1,26 +1,28 @@
 package services;
 
+import database.CSVReader;
 import database.IDatabaseOperations;
 import features.Credit;
 import features.Currency;
 import features.interfaces.Numeric;
 import users.Client;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class CreditService implements IDatabaseOperations<Credit> {
     private static CreditService creditServiceInstance = null;
-    List<Credit> clientCredits;
-    Credit selectedCredit;
+    private List<Credit> credits;
+    private List<Credit> clientCredits;
+    private Credit selectedCredit;
     HashMap<String, Double> typeDobanda;
     private final Double MAX_CREDIT_AMOUNT = 50000000.0;
     private final int CREDITS_LIMIT = 5;
     private static Scanner scan = new Scanner(System.in);
-    private Integer lastId = 0;
-
 
     private CreditService() { setNull(); }
 
@@ -29,11 +31,6 @@ public class CreditService implements IDatabaseOperations<Credit> {
             creditServiceInstance = new CreditService();
         return creditServiceInstance;
     }
-
-//    public CreditService(HashMap<String, Double> typeDobanda) {
-//        setNull();
-//        this.typeDobanda = typeDobanda;
-//    }
 
     public void setNull() {
         clientCredits = null;
@@ -103,8 +100,10 @@ public class CreditService implements IDatabaseOperations<Credit> {
         Double balance = Numeric.getBalance(scan, MAX_CREDIT_AMOUNT);
         String type = printAndGetType();
         Double dobanda = typeDobanda.get(type);
-        Credit newCredit = new Credit(lastId++, cls.getCurrentClient(), currency, dobanda, type, balance, 0.0);
+        Integer id = credits.size() == 0 ? 1 : credits.get(credits.size() - 1).getID() + 1;
+        Credit newCredit = new Credit(id, cls.getCurrentClient(), currency, dobanda, type, balance, 0.0);
         clientCredits.add(newCredit);
+        credits.add(newCredit);
         System.out.println("Creditul a fost deschis cu succes!");
     }
 
@@ -118,6 +117,7 @@ public class CreditService implements IDatabaseOperations<Credit> {
             return;
         }
         clientCredits.remove(selectedCredit);
+        credits.remove(selectedCredit);
         selectedCredit = null;
         System.out.println("Creditul a fost sters cu succes");
     }
@@ -138,17 +138,31 @@ public class CreditService implements IDatabaseOperations<Credit> {
     /*
         Database related operations
      */
+
     @Override
-    public Credit toObjectFromDB(String[] dbRow, Object... services) {
-        ClientService cls = null;
-        CurrencyService crs = null;
-        if (services[0] instanceof ClientService) cls = (ClientService) services[0];
-        if (services[1] instanceof CurrencyService) crs = (CurrencyService) services[1];
+    public List<Credit> getCollection() { return credits; }
+
+    @Override
+    public void load(List<Credit> credits) {
+        this.credits = credits;
+        typeDobanda = new HashMap<>();
+        try {
+            List<String[]> data = CSVReader.getInstance().readFile(Paths.get(System.getProperty("user.dir"), "src", "database", "data", "CreditsDobanda.csv").toString());
+            for (String[] line: data) {
+                typeDobanda.put(line[0], Double.parseDouble(line[1]));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    public Credit toObjectFromDB(String[] dbRow) {
         int id = Integer.parseInt(dbRow[0]);
         Integer clientID = Integer.parseInt(dbRow[1]);
         Integer currencyID = Integer.parseInt(dbRow[2]);
-        Client client = cls.getElementById(clientID);
-        Currency currency = crs.getElementById(currencyID);
+        Client client = ClientService.getInstance().getElementById(clientID);
+        Currency currency = CurrencyService.getInstance().getElementById(currencyID);
         Double dobanda = Double.parseDouble(dbRow[3]);
         String type = dbRow[4];
         Double sumaImprumutata = Double.parseDouble(dbRow[5]);
@@ -176,9 +190,17 @@ public class CreditService implements IDatabaseOperations<Credit> {
          exact ca si Just si Nothing
         */
         Optional<Credit> maybeCredit =
-                clientCredits.stream()
+                credits.stream()
                         .filter(credit -> credit.getID().equals(id))
                         .findFirst();
         return maybeCredit.orElse(null);
+    }
+
+    public List<Credit> getCreditsByClientId(Integer clientID) {
+        List<Credit> clCredits =
+                credits.stream()
+                        .filter(credit -> credit.getClient().getID().equals(clientID))
+                        .collect(Collectors.toList());
+        return clCredits;
     }
 }

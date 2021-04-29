@@ -31,15 +31,31 @@ public class Client extends Person {
         return accounts;
     }
 
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
+    }
+
     public List<Deposit> getDeposits() {
         return deposits;
+    }
+
+    public void setDeposits(List<Deposit> deposits) {
+        this.deposits = deposits;
     }
 
     public List<Credit> getCredits() {
         return credits;
     }
 
+    public void setCredits(List<Credit> credits) {
+        this.credits = credits;
+    }
+
     public Set<Transaction> getTransactions() { return transactions; }
+
+    public void setTransactions(Set<Transaction> transactions) {
+        this.transactions = transactions;
+    }
 
     public String getClientType() { return clientType; }
 

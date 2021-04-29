@@ -2,3 +2,68 @@ exit,Time: 29.04.2021, 17:09
 register,Time: 29.04.2021, 17:13
 login,Time: 29.04.2021, 17:13
 exit,Time: 29.04.2021, 17:13
+login,Time: 29.04.2021, 21:33
+logout,Time: 29.04.2021, 21:33
+register,Time: 29.04.2021, 21:33
+login,Time: 29.04.2021, 21:34
+login,Time: 29.04.2021, 21:34
+show-info,Time: 29.04.2021, 21:34
+open account,Time: 29.04.2021, 21:34
+show-info,Time: 29.04.2021, 21:34
+show-accounts,Time: 29.04.2021, 21:35
+select-account 1,Time: 29.04.2021, 21:35
+show-account-info,Time: 29.04.2021, 21:35
+logout,Time: 29.04.2021, 21:35
+login,Time: 29.04.2021, 21:35
+open account,Time: 29.04.2021, 21:36
+select-account 1,Time: 29.04.2021, 21:36
+show-account-info,Time: 29.04.2021, 21:36
+transfer-money,Time: 29.04.2021, 21:36
+show-account-info,Time: 29.04.2021, 21:36
+show-transfers,Time: 29.04.2021, 21:36
+logout,Time: 29.04.2021, 21:36
+login,Time: 29.04.2021, 21:37
+login,Time: 29.04.2021, 21:37
+login,Time: 29.04.2021, 21:38
+show-info,Time: 29.04.2021, 21:38
+show-transfers,Time: 29.04.2021, 21:38
+select-account 1,Time: 29.04.2021, 21:38
+show-account-info,Time: 29.04.2021, 21:38
+logout,Time: 29.04.2021, 21:38
+exit,Time: 29.04.2021, 21:38
+login,Time: 29.04.2021, 21:58
+show-info,Time: 29.04.2021, 21:58
+select-account 1,Time: 29.04.2021, 21:58
+show-account-info,Time: 29.04.2021, 21:59
+transfer-money,Time: 29.04.2021, 21:59
+show-account-info,Time: 29.04.2021, 21:59
+logout,Time: 29.04.2021, 21:59
+login,Time: 29.04.2021, 21:59
+login,Time: 29.04.2021, 21:59
+show-info,Time: 29.04.2021, 22:00
+show-transfers,Time: 29.04.2021, 22:00
+select-account 1,Time: 29.04.2021, 22:00
+show-account-info,Time: 29.04.2021, 22:00
+register,Time: 29.04.2021, 22:01
+login,Time: 29.04.2021, 22:01
+show-accounts,Time: 29.04.2021, 22:02
+open account,Time: 29.04.2021, 22:02
+show-info,Time: 29.04.2021, 22:02
+show-accounts,Time: 29.04.2021, 22:02
+open deposit,Time: 29.04.2021, 22:02
+show-info,Time: 29.04.2021, 22:02
+show-deposit-info,Time: 29.04.2021, 22:03
+open credit,Time: 29.04.2021, 22:03
+show-info,Time: 29.04.2021, 22:04
+logout,Time: 29.04.2021, 22:04
+login,Time: 29.04.2021, 22:04
+logout,Time: 29.04.2021, 22:04
+login,Time: 29.04.2021, 22:04
+logout,Time: 29.04.2021, 22:04
+exit,Time: 29.04.2021, 22:04
+login,Time: 29.04.2021, 22:17
+show-info,Time: 29.04.2021, 22:18
+logout,Time: 29.04.2021, 22:18
+login,Time: 29.04.2021, 22:18
+show-info,Time: 29.04.2021, 22:18
+show-transfers,Time: 29.04.2021, 22:18

@@ -12,11 +12,11 @@ public class Transaction implements Comparable<Transaction> {
     private Double amount;
     private Currency currency;
 
-    public Transaction(Integer id, Account fromAccount, Account toAccount, Double amount, Currency currency) {
+    public Transaction(Integer id, Account fromAccount, Account toAccount, Double amount, Currency currency, LocalDateTime transactionTime) {
         this.id = id;
         this.fromAccount = fromAccount;
         this.toAccount = toAccount;
-        this.transactionTime = LocalDateTime.now();
+        this.transactionTime = transactionTime == null ? LocalDateTime.now() : transactionTime;
         this.amount = amount;
         this.currency = currency;
     }

@@ -35,7 +35,7 @@ public interface Numeric {
                 } else if (balance < 0.0) {
                     System.out.println("Valoarea introdusa este una negativa. Introduceti o valoare pozitiva");
                 } else {
-                    return balance;
+                    return RoundTwoDecimals(balance);
                 }
             }
             else
@@ -49,5 +49,9 @@ public interface Numeric {
 
     static Integer RandomNumber(Integer MIN_VALUE, Integer MAX_VALUE) {
         return ThreadLocalRandom.current().nextInt(MIN_VALUE, MAX_VALUE + 1);
+    }
+
+    static Double RoundTwoDecimals(Double number) {
+        return Math.round(number * 100) / 100.0;
     }
 }

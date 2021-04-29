@@ -148,6 +148,8 @@ public class BankApp {
     }
 
     public void run() {
+        // Load the database
+        db.loadDatabase();
         System.out.println("Welcome to Ubermensch. Log in or register a new account to continue");
         String appName = "Ubermensch>";
         String loggedInName;
@@ -159,5 +161,8 @@ public class BankApp {
             boolean done = executeCommand(action);
             if (done) auditService.LogAction(action);
         }
+
+        // Store the database
+        db.storeDatabase();
     }
 }

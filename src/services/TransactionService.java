@@ -7,16 +7,19 @@ import features.Transaction;
 import features.interfaces.Numeric;
 import users.Client;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TransactionService implements IDatabaseOperations<Transaction> {
     private static TransactionService transactionServiceInstance = null;
+    private List<Transaction> transactions;
     private static Scanner scan = new Scanner(System.in);
     private final Double MAX_TRANSACTION_VALUE = 10000.0;
     Set<Transaction> clientTransactions;
-    private Integer lastId = 0;
 
     private TransactionService() { setNull(); }
 
@@ -74,8 +77,11 @@ public class TransactionService implements IDatabaseOperations<Transaction> {
     }
 
     public void addTransaction(Account from, Account other, Double amount, Currency currency) {
-        clientTransactions.add(new Transaction(lastId++, from, other, amount, currency));
-        other.getClient().getTransactions().add(new Transaction(lastId++, other, from, amount, currency));
+        Integer id = transactions.size() == 0 ? 1 : transactions.get(transactions.size() - 1).getID() + 1;
+        Transaction trans = new Transaction(id, from, other, amount, currency, null);
+        clientTransactions.add(trans);
+        other.getClient().getTransactions().add(trans);
+        transactions.add(trans);
     }
 
     public void clearTransactions() {
@@ -88,13 +94,27 @@ public class TransactionService implements IDatabaseOperations<Transaction> {
     /*
         Database related operations
      */
+
     @Override
-    public Transaction toObjectFromDB(String[] dbRow, Object... services) {
+    public List<Transaction> getCollection() { return transactions; }
+
+    @Override
+    public void load(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    @Override
+    public Transaction toObjectFromDB(String[] dbRow) {
         Integer id = Integer.parseInt(dbRow[0]);
         Integer accountFromID = Integer.parseInt(dbRow[1]);
         Integer accountToID = Integer.parseInt(dbRow[2]);
-        Integer currencyID = Integer.parseInt(dbRow[3]);
-        return null;
+        Double amount = Double.parseDouble(dbRow[3]);
+        Integer currencyID = Integer.parseInt(dbRow[4]);
+        LocalDateTime creationDate = LocalDateTime.parse(dbRow[5]);
+        Account fromAccount = AccountService.getInstance().getElementById(accountFromID);
+        Account toAccount = AccountService.getInstance().getElementById(accountToID);
+        Currency currency = CurrencyService.getInstance().getElementById(currencyID);
+        return new Transaction(id, fromAccount, toAccount, amount, currency, creationDate);
     }
 
     @Override
@@ -103,7 +123,9 @@ public class TransactionService implements IDatabaseOperations<Transaction> {
                 obj.getID().toString(),
                 obj.getFromAccount().getID().toString(),
                 obj.getToAccount().getID().toString(),
-                obj.getCurrency().getID().toString()
+                obj.getAmount().toString(),
+                obj.getCurrency().getID().toString(),
+                obj.getTransactionTime().toString()
         };
     }
 
@@ -118,5 +140,13 @@ public class TransactionService implements IDatabaseOperations<Transaction> {
                         .filter(transaction -> transaction.getID().equals(id))
                         .findFirst();
         return maybeTransaction.orElse(null);
+    }
+
+    public List<Transaction> getTransactionsByClientId(Integer clientID) {
+        List<Transaction> clTransactions =
+                transactions.stream()
+                        .filter(transaction -> transaction.getFromAccount().getClient().getID().equals(clientID) || transaction.getToAccount().getClient().getID().equals(clientID))
+                        .collect(Collectors.toList());
+        return clTransactions;
     }
 }

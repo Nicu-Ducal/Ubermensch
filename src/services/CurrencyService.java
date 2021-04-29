@@ -1,5 +1,6 @@
 package services;
 
+import database.Database;
 import database.IDatabaseOperations;
 import features.Currency;
 import features.ExchangeCurrency;
@@ -12,7 +13,7 @@ import java.util.Scanner;
 
 public class CurrencyService implements IDatabaseOperations<Currency> {
     private static CurrencyService currencyServiceInstance = null;
-    private final List<Currency> currencies;
+    private List<Currency> currencies;
     HashMap<ExchangeCurrency, Double> exchangeRates;
 
     private CurrencyService() {
@@ -24,11 +25,6 @@ public class CurrencyService implements IDatabaseOperations<Currency> {
             currencyServiceInstance = new CurrencyService();
         return currencyServiceInstance;
     }
-
-//    public CurrencyService(List<Currency> currencies, HashMap<ExchangeCurrency, Double> rates) {
-//        this.currencies = currencies;
-//        this.exchangeRates = rates;
-//    }
 
     public List<Currency> getCurrencies() {
         return currencies;
@@ -67,17 +63,29 @@ public class CurrencyService implements IDatabaseOperations<Currency> {
         ExchangeCurrency excr1 = new ExchangeCurrency(fromCurr, toCurr);
         ExchangeCurrency excr2 = new ExchangeCurrency(toCurr, fromCurr);
         if (exchangeRates.containsKey(excr1))
-            return amount * exchangeRates.get(excr1);
+            return Numeric.RoundTwoDecimals(amount * exchangeRates.get(excr1));
         if (exchangeRates.containsKey(excr2))
-            return amount * (1.0 / exchangeRates.get(excr2));
+            return Numeric.RoundTwoDecimals(amount * (1.0 / exchangeRates.get(excr2)));
         throw new Exception("Nu exista posibilitatea de schimb valutar de la " + fromCurr.getFullName() + " la " + toCurr.getFullName());
     }
 
     /*
         Database related operations
      */
+
     @Override
-    public Currency toObjectFromDB(String[] dbRow, Object... services) {
+    public List<Currency> getCollection() {
+        return currencies;
+    }
+
+    @Override
+    public void load(List<Currency> currencies) {
+        this.currencies = currencies;
+        exchangeRates = Database.getInstance().createExchanges();
+    }
+
+    @Override
+    public Currency toObjectFromDB(String[] dbRow) {
         int id = Integer.parseInt(dbRow[0]);
         String name = dbRow[1];
         String international = dbRow[2];

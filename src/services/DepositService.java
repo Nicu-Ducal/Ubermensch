@@ -1,25 +1,28 @@
 package services;
 
+import database.CSVReader;
 import database.IDatabaseOperations;
 import features.Currency;
 import features.Deposit;
 import features.interfaces.Numeric;
 import users.Client;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class DepositService implements IDatabaseOperations<Deposit> {
     private static DepositService depositServiceInstance = null;
-    List<Deposit> clientDeposits;
-    Deposit selectedDeposit;
+    private List<Deposit> deposits;
+    private List<Deposit> clientDeposits;
+    private Deposit selectedDeposit;
     HashMap<String, Double> typeDobanda;
     private static Scanner scan = new Scanner(System.in);
     private final int DEPOSITS_LIMIT = 10;
     private final Double MAX_DEPOSIT_BALANCE = 100000000.0;
-    private Integer lastId = 0;
 
     private DepositService() { setNull(); }
 
@@ -28,11 +31,6 @@ public class DepositService implements IDatabaseOperations<Deposit> {
             depositServiceInstance = new DepositService();
         return depositServiceInstance;
     }
-
-//    public DepositService(HashMap<String, Double> typeDobanda) {
-//        setNull();
-//        this.typeDobanda = typeDobanda;
-//    }
 
     public void setClientDeposits(Client client) throws Exception {
         if (client == null)
@@ -96,8 +94,10 @@ public class DepositService implements IDatabaseOperations<Deposit> {
         Double balance = Numeric.getBalance(scan, MAX_DEPOSIT_BALANCE);
         String type = printAndGetType();
         Double dobanda = typeDobanda.get(type);
-        Deposit newDeposit = new Deposit(lastId++, cls.getCurrentClient(), currency, dobanda, type, balance);
+        Integer id = deposits.size() == 0 ? 1 : deposits.get(deposits.size() - 1).getID() + 1;
+        Deposit newDeposit = new Deposit(id, cls.getCurrentClient(), currency, dobanda, type, balance);
         clientDeposits.add(newDeposit);
+        deposits.add(newDeposit);
         System.out.println("Depositul a fost deschis cu succes!");
     }
 
@@ -111,6 +111,7 @@ public class DepositService implements IDatabaseOperations<Deposit> {
             return;
         }
         clientDeposits.remove(selectedDeposit);
+        deposits.remove(selectedDeposit);
         selectedDeposit = null;
         System.out.println("Depositul a fost sters cu succes");
     }
@@ -131,17 +132,31 @@ public class DepositService implements IDatabaseOperations<Deposit> {
     /*
         Database related operations
      */
+
     @Override
-    public Deposit toObjectFromDB(String[] dbRow, Object... services) {
-        ClientService cls = null;
-        CurrencyService crs = null;
-        if (services[0] instanceof ClientService) cls = (ClientService) services[0];
-        if (services[1] instanceof CurrencyService) crs = (CurrencyService) services[1];
+    public List<Deposit> getCollection() { return deposits; }
+
+    @Override
+    public void load(List<Deposit> deposits) {
+        this.deposits = deposits;
+        typeDobanda = new HashMap<>();
+        try {
+            List<String[]> data = CSVReader.getInstance().readFile(Paths.get(System.getProperty("user.dir"), "src", "database", "data", "DepositsDobanda.csv").toString());
+            for (String[] line: data) {
+                typeDobanda.put(line[0], Double.parseDouble(line[1]));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    public Deposit toObjectFromDB(String[] dbRow) {
         int id = Integer.parseInt(dbRow[0]);
         Integer clientID = Integer.parseInt(dbRow[1]);
         Integer currencyID = Integer.parseInt(dbRow[2]);
-        Client client = cls.getElementById(clientID);
-        Currency currency = crs.getElementById(currencyID);
+        Client client = ClientService.getInstance().getElementById(clientID);
+        Currency currency = CurrencyService.getInstance().getElementById(currencyID);
         Double dobanda = Double.parseDouble(dbRow[3]);
         String type = dbRow[4];
         Double sumaDepusa = Double.parseDouble(dbRow[5]);
@@ -167,9 +182,17 @@ public class DepositService implements IDatabaseOperations<Deposit> {
          exact ca si Just si Nothing
         */
         Optional<Deposit> maybeDeposit =
-                clientDeposits.stream()
+                deposits.stream()
                         .filter(deposit -> deposit.getID().equals(id))
                         .findFirst();
         return maybeDeposit.orElse(null);
+    }
+
+    public List<Deposit> getDepositsByClientId(Integer clientID) {
+        List<Deposit> clDeposits =
+                deposits.stream()
+                        .filter(deposit -> deposit.getClient().getID().equals(clientID))
+                        .collect(Collectors.toList());
+        return clDeposits;
     }
 }

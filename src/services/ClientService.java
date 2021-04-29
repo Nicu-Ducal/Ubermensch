@@ -8,13 +8,11 @@ import java.util.*;
 
 public class ClientService implements IDatabaseOperations<Client> {
     private static ClientService clientServiceInstance = null;
-    private List<Client> clientList;
+    private List<Client> clients;
     HashSet<String> usernames;
     HashSet<String> emails;
     private Client currentClient;
     private static Scanner scan = new Scanner(System.in);
-    private Integer lastId = 0;
-
 
     private ClientService() {}
 
@@ -24,16 +22,7 @@ public class ClientService implements IDatabaseOperations<Client> {
         return clientServiceInstance;
     }
 
-//    public ClientService(List<Client> clientList) {
-//        this.clientList = clientList;
-//        this.currentClient = null;
-//        usernames = new HashSet<>();
-//        emails = new HashSet<>();
-//        for (Client cl: clientList) {
-//            usernames.add(cl.getUsername());
-//            emails.add(cl.getEmail());
-//        }
-//    }
+    public List<Client> getClients() { return clients; }
 
     public Client getCurrentClient() {
         return currentClient;
@@ -48,7 +37,7 @@ public class ClientService implements IDatabaseOperations<Client> {
         String username = scan.nextLine();
         System.out.print("Introduceti parola: ");
         String password = scan.nextLine();
-        for (Client cl: clientList) {
+        for (Client cl: clients) {
             if (cl.getUsername().equals(username) && cl.checkPassword(password)) {
                 currentClient = cl;
                 try {
@@ -113,7 +102,8 @@ public class ClientService implements IDatabaseOperations<Client> {
             }
             System.out.println("Introduceti un tip valid");
         }
-        clientList.add(new Client(lastId++, username, password, name, email, tip));
+        Integer id = clients.size() == 0 ? 1 : clients.get(clients.size() - 1).getID() + 1;
+        clients.add(new Client(id, username, password, name, email, tip));
         usernames.add(username);
         emails.add(email);
         System.out.println("V-ati inregistrat cu success. Acum puteti va logati cu username-ul si parola specificate la inregistrare");
@@ -132,7 +122,7 @@ public class ClientService implements IDatabaseOperations<Client> {
             System.out.println("Trebuie sa va logati pentru a efectua aceasta operatie");
             return null;
         }
-        List<Person> otherUsers = new ArrayList<>(clientList);
+        List<Person> otherUsers = new ArrayList<>(clients);
         otherUsers.remove(currentClient);
         for (int i = 0; i < otherUsers.size(); i++)
             System.out.println((i + 1) + ") " + otherUsers.get(i).getName());
@@ -147,8 +137,23 @@ public class ClientService implements IDatabaseOperations<Client> {
     /*
         Database related operations
      */
+
     @Override
-    public Client toObjectFromDB(String[] dbRow, Object... services) {
+    public List<Client> getCollection() { return clients; }
+
+    @Override
+    public void load(List<Client> clients) {
+        this.clients = clients;
+        usernames = new HashSet<>();
+        emails = new HashSet<>();
+        for (Client cl: clients) {
+            usernames.add(cl.getUsername());
+            emails.add(cl.getEmail());
+        }
+    }
+
+    @Override
+    public Client toObjectFromDB(String[] dbRow) {
         int id = Integer.parseInt(dbRow[0]);
         String username = dbRow[1];
         String password = dbRow[2];
@@ -164,6 +169,7 @@ public class ClientService implements IDatabaseOperations<Client> {
                 cl.getID().toString(),
                 cl.getUsername(),
                 cl.getPassword(),
+                cl.getName(),
                 cl.getEmail(),
                 cl.getClientType()
         };
@@ -176,9 +182,18 @@ public class ClientService implements IDatabaseOperations<Client> {
          exact ca si Just si Nothing
         */
         Optional<Client> maybeClient =
-                clientList.stream()
+                clients.stream()
                 .filter(client -> client.getID().equals(id))
                 .findFirst();
         return maybeClient.orElse(null);
+    }
+
+    public void setData() {
+        for (Client client: clients) {
+            client.setAccounts(AccountService.getInstance().getAccountsByClientId(client.getID()));
+            client.setDeposits(DepositService.getInstance().getDepositsByClientId(client.getID()));
+            client.setCredits(CreditService.getInstance().getCreditsByClientId(client.getID()));
+            client.setTransactions(new TreeSet<>(TransactionService.getInstance().getTransactionsByClientId(client.getID())));
+        }
     }
 }
