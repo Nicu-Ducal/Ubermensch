@@ -10,7 +10,15 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Database {
-    public Database() {}
+    public static Database databaseInstance = null;
+
+    private Database() {}
+
+    public static Database getInstance() {
+        if (databaseInstance == null)
+            databaseInstance = new Database();
+        return databaseInstance;
+    }
 
     public List<Client> createClients() {
         List<Client> db = new ArrayList<>();

@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class AccountService implements IDatabaseOperations<Account> {
+    private static AccountService accountServiceInstance = null;
     private List<Account> clientAccounts;
     private Account selectedAccount;
     private static Scanner scan = new Scanner(System.in);
@@ -21,8 +22,14 @@ public class AccountService implements IDatabaseOperations<Account> {
     private Integer lastId = 0;
 
 
-    public AccountService() {
+    private AccountService() {
         setNull();
+    }
+
+    public static AccountService getInstance() {
+        if (accountServiceInstance == null)
+            accountServiceInstance = new AccountService();
+        return accountServiceInstance;
     }
 
     public void setClientAccounts(Client client) throws Exception {

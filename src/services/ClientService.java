@@ -7,6 +7,7 @@ import users.Person;
 import java.util.*;
 
 public class ClientService implements IDatabaseOperations<Client> {
+    private static ClientService clientServiceInstance = null;
     private List<Client> clientList;
     HashSet<String> usernames;
     HashSet<String> emails;
@@ -15,16 +16,24 @@ public class ClientService implements IDatabaseOperations<Client> {
     private Integer lastId = 0;
 
 
-    public ClientService(List<Client> clientList) {
-        this.clientList = clientList;
-        this.currentClient = null;
-        usernames = new HashSet<>();
-        emails = new HashSet<>();
-        for (Client cl: clientList) {
-            usernames.add(cl.getUsername());
-            emails.add(cl.getEmail());
-        }
+    private ClientService() {}
+
+    public static ClientService getInstance() {
+        if (clientServiceInstance == null)
+            clientServiceInstance = new ClientService();
+        return clientServiceInstance;
     }
+
+//    public ClientService(List<Client> clientList) {
+//        this.clientList = clientList;
+//        this.currentClient = null;
+//        usernames = new HashSet<>();
+//        emails = new HashSet<>();
+//        for (Client cl: clientList) {
+//            usernames.add(cl.getUsername());
+//            emails.add(cl.getEmail());
+//        }
+//    }
 
     public Client getCurrentClient() {
         return currentClient;

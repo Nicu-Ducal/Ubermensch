@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class DepositService implements IDatabaseOperations<Deposit> {
+    public static DepositService depositServiceInstance = null;
     List<Deposit> clientDeposits;
     Deposit selectedDeposit;
     HashMap<String, Double> typeDobanda;
@@ -20,10 +21,18 @@ public class DepositService implements IDatabaseOperations<Deposit> {
     public final Double MAX_DEPOSIT_BALANCE = 100000000.0;
     private Integer lastId = 0;
 
-    public DepositService(HashMap<String, Double> typeDobanda) {
-        setNull();
-        this.typeDobanda = typeDobanda;
+    private DepositService() { setNull(); }
+
+    public static DepositService getInstance() {
+        if (depositServiceInstance == null)
+            depositServiceInstance = new DepositService();
+        return depositServiceInstance;
     }
+
+//    public DepositService(HashMap<String, Double> typeDobanda) {
+//        setNull();
+//        this.typeDobanda = typeDobanda;
+//    }
 
     public void setClientDeposits(Client client) throws Exception {
         if (client == null)

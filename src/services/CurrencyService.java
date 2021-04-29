@@ -11,13 +11,24 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class CurrencyService implements IDatabaseOperations<Currency> {
+    public static CurrencyService currencyServiceInstance = null;
     private final List<Currency> currencies;
     HashMap<ExchangeCurrency, Double> exchangeRates;
 
-    public CurrencyService(List<Currency> currencies, HashMap<ExchangeCurrency, Double> rates) {
-        this.currencies = currencies;
-        this.exchangeRates = rates;
+    private CurrencyService() {
+        currencies = null;
     }
+
+    public static CurrencyService getInstance() {
+        if (currencyServiceInstance == null)
+            currencyServiceInstance = new CurrencyService();
+        return currencyServiceInstance;
+    }
+
+//    public CurrencyService(List<Currency> currencies, HashMap<ExchangeCurrency, Double> rates) {
+//        this.currencies = currencies;
+//        this.exchangeRates = rates;
+//    }
 
     public List<Currency> getCurrencies() {
         return currencies;

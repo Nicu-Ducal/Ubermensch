@@ -15,6 +15,7 @@ public class BankApp {
     private static BankApp bank = null;
     private static Scanner scan = new Scanner(System.in);
 
+    private Database db;
     private AuditService auditService;
     private ClientService clientService;
     private AccountService accountService;
@@ -26,14 +27,14 @@ public class BankApp {
     private Clip music;
 
     private BankApp() {
-        Database db = new Database();
+        db = Database.getInstance();
         auditService = AuditService.getInstance();
-        clientService = new ClientService(db.createClients());
-        accountService = new AccountService();
-        currencyService = new CurrencyService(db.createCurrencies(), db.createExchanges());
-        depositService = new DepositService(db.createDepositDobanda());
-        creditService = new CreditService(db.createCreditDobanda());
-        transactionService = new TransactionService();
+        clientService = ClientService.getInstance();
+        accountService = AccountService.getInstance();
+        currencyService = CurrencyService.getInstance();
+        depositService = DepositService.getInstance();
+        creditService = CreditService.getInstance();
+        transactionService = TransactionService.getInstance();
         running = true;
     }
 

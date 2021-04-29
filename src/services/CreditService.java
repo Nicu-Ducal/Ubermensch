@@ -12,19 +12,28 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class CreditService implements IDatabaseOperations<Credit> {
+    public static CreditService creditServiceInstance = null;
     List<Credit> clientCredits;
     Credit selectedCredit;
     HashMap<String, Double> typeDobanda;
-    public final Double MAX_CREDIT_AMMOUNT = 50000000.0;
+    public final Double MAX_CREDIT_AMOUNT = 50000000.0;
     public final int CREDITS_LIMIT = 5;
     private static Scanner scan = new Scanner(System.in);
     private Integer lastId = 0;
 
 
-    public CreditService(HashMap<String, Double> typeDobanda) {
-        setNull();
-        this.typeDobanda = typeDobanda;
+    private CreditService() { setNull(); }
+
+    public static CreditService getInstance() {
+        if (creditServiceInstance == null)
+            creditServiceInstance = new CreditService();
+        return creditServiceInstance;
     }
+
+//    public CreditService(HashMap<String, Double> typeDobanda) {
+//        setNull();
+//        this.typeDobanda = typeDobanda;
+//    }
 
     public void setNull() {
         clientCredits = null;
@@ -91,7 +100,7 @@ public class CreditService implements IDatabaseOperations<Credit> {
         }
         Currency currency = crs.selectCurrency();
         System.out.print("Introduceti suma de bani pe care doriti sa o imprumutati: ");
-        Double balance = Numeric.getBalance(scan, MAX_CREDIT_AMMOUNT);
+        Double balance = Numeric.getBalance(scan, MAX_CREDIT_AMOUNT);
         String type = printAndGetType();
         Double dobanda = typeDobanda.get(type);
         Credit newCredit = new Credit(lastId++, cls.getCurrentClient(), currency, dobanda, type, balance, 0.0);

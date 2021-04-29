@@ -12,14 +12,18 @@ import java.util.Scanner;
 import java.util.Set;
 
 public class TransactionService implements IDatabaseOperations<Transaction> {
+    public static TransactionService transactionServiceInstance = null;
     private static Scanner scan = new Scanner(System.in);
     private final Double MAX_TRANSACTION_VALUE = 10000.0;
     Set<Transaction> clientTransactions;
     private Integer lastId = 0;
 
+    private TransactionService() { setNull(); }
 
-    public TransactionService() {
-        setNull();
+    public static TransactionService getInstance() {
+        if (transactionServiceInstance == null)
+            transactionServiceInstance = new TransactionService();
+        return transactionServiceInstance;
     }
 
     public void setTransactions(Client cl) {
