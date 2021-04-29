@@ -1,18 +1,22 @@
 package services;
 
+import database.IDatabaseOperations;
 import features.Account;
 import features.Currency;
 import features.Transaction;
 import features.interfaces.Numeric;
 import users.Client;
 
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
-public class TransactionService {
+public class TransactionService implements IDatabaseOperations<Transaction> {
     private static Scanner scan = new Scanner(System.in);
     private final Double MAX_TRANSACTION_VALUE = 10000.0;
     Set<Transaction> clientTransactions;
+    private Integer lastId = 0;
+
 
     public TransactionService() {
         setNull();
@@ -66,8 +70,8 @@ public class TransactionService {
     }
 
     public void addTransaction(Account from, Account other, Double amount, Currency currency) {
-        clientTransactions.add(new Transaction(from, other, amount, currency));
-        other.getClient().getTransactions().add(new Transaction(other, from, amount, currency));
+        clientTransactions.add(new Transaction(lastId++, from, other, amount, currency));
+        other.getClient().getTransactions().add(new Transaction(lastId++, other, from, amount, currency));
     }
 
     public void clearTransactions() {
@@ -75,5 +79,40 @@ public class TransactionService {
             System.out.println("Trebuie sa va logati pentru a putea sterge tranzactiile");
         }
         clientTransactions.clear();
+    }
+
+    /*
+        Database related operations
+     */
+    @Override
+    public Transaction toObjectFromDB(String[] dbRow, Object... services) {
+        Integer id = Integer.parseInt(dbRow[0]);
+        Integer accountFromID = Integer.parseInt(dbRow[1]);
+        Integer accountToID = Integer.parseInt(dbRow[2]);
+        Integer currencyID = Integer.parseInt(dbRow[3]);
+        return null;
+    }
+
+    @Override
+    public String[] toDBString(Transaction obj) {
+        return new String[] {
+                obj.getID().toString(),
+                obj.getFromAccount().getID().toString(),
+                obj.getToAccount().getID().toString(),
+                obj.getCurrency().getID().toString()
+        };
+    }
+
+    @Override
+    public Transaction getElementById(Integer id) {
+        /*
+         Ceva similiar cu Maybe din Haskell, daca gaseste un client, atunci pastreaza referinta lui, daca nu, pastreaza null,
+         exact ca si Just si Nothing
+        */
+        Optional<Transaction> maybeTransaction =
+                clientTransactions.stream()
+                        .filter(transaction -> transaction.getID().equals(id))
+                        .findFirst();
+        return maybeTransaction.orElse(null);
     }
 }

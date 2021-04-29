@@ -5,6 +5,7 @@ import features.interfaces.Numeric;
 import java.time.LocalDateTime;
 
 public class CreditCard {
+    private final Integer id;
     private LocalDateTime creationDate;
     private LocalDateTime expirationDate;
     private Account linkedAccount;
@@ -17,6 +18,7 @@ public class CreditCard {
 
 
     public CreditCard(Account linkedAccount) {
+        this.id = Numeric.RandomNumber(0, 100);
         this.creationDate = LocalDateTime.now();
         this.expirationDate = this.creationDate.plusYears(4);
         this.linkedAccount = linkedAccount;

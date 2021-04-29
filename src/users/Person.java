@@ -1,7 +1,7 @@
 package users;
 
 public abstract class Person {
-    protected final int id;
+    protected final Integer id;
     protected String username;
     protected String password;
     protected String name;
@@ -14,6 +14,8 @@ public abstract class Person {
         this.name = name;
         this.email = email;
     }
+
+    public Integer getID() { return id; }
 
     public String getUsername() {
         return username;
@@ -46,6 +48,8 @@ public abstract class Person {
     public Boolean checkPassword(String password) {
         return this.password.equals(password);
     }
+
+    public String getPassword() { return password; }
 
     public abstract String toString();
 

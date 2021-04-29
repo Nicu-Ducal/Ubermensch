@@ -1,14 +1,16 @@
 package services;
 
+import database.IDatabaseOperations;
 import features.Currency;
 import features.ExchangeCurrency;
 import features.interfaces.Numeric;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
-public class CurrencyService {
+public class CurrencyService implements IDatabaseOperations<Currency> {
     private final List<Currency> currencies;
     HashMap<ExchangeCurrency, Double> exchangeRates;
 
@@ -58,5 +60,38 @@ public class CurrencyService {
         if (exchangeRates.containsKey(excr2))
             return amount * (1.0 / exchangeRates.get(excr2));
         throw new Exception("Nu exista posibilitatea de schimb valutar de la " + fromCurr.getFullName() + " la " + toCurr.getFullName());
+    }
+
+    /*
+        Database related operations
+     */
+    @Override
+    public Currency toObjectFromDB(String[] dbRow, Object... services) {
+        int id = Integer.parseInt(dbRow[0]);
+        String name = dbRow[1];
+        String international = dbRow[2];
+        return new Currency(id, name, international);
+    }
+
+    @Override
+    public String[] toDBString(Currency obj) {
+        return new String[] {
+                obj.getID().toString(),
+                obj.getName(),
+                obj.getInternational()
+        };
+    }
+
+    @Override
+    public Currency getElementById(Integer id) {
+        /*
+         Ceva similiar cu Maybe din Haskell, daca gaseste un client, atunci pastreaza referinta lui, daca nu, pastreaza null,
+         exact ca si Just si Nothing
+        */
+        Optional<Currency> maybeCurrency =
+                currencies.stream()
+                        .filter(currency -> currency.getID().equals(id))
+                        .findFirst();
+        return maybeCurrency.orElse(null);
     }
 }

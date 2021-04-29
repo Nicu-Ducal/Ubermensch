@@ -1,19 +1,24 @@
 package services;
 
+import database.IDatabaseOperations;
 import features.Account;
+import features.CreditCard;
 import features.Currency;
 import features.interfaces.Numeric;
 import users.Client;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
-public class AccountService {
+public class AccountService implements IDatabaseOperations<Account> {
     private List<Account> clientAccounts;
     private Account selectedAccount;
     private static Scanner scan = new Scanner(System.in);
     private final int ACCOUNTS_LIMIT = 10;
     public final Double MAX_ACCOUNT_BALANCE = 1000000.0;
+    private Integer lastId = 0;
 
 
     public AccountService() {
@@ -71,7 +76,7 @@ public class AccountService {
         System.out.print("Introduceti suma de bani: ");
         Double balance = Numeric.getBalance(scan, MAX_ACCOUNT_BALANCE);
 
-        Account newAccount = new Account(cls.getCurrentClient(), currency, balance);
+        Account newAccount = new Account(lastId++, cls.getCurrentClient(), currency, balance);
         clientAccounts.add(newAccount);
         System.out.println("Operatiune realizata cu succes. Doriti sa fie eliberat si un card bancar pentru contul creat? (y/n)");
         while (true) {
@@ -199,5 +204,50 @@ public class AccountService {
                 return accounts.get(idx - 1);
             System.out.println("Introduceti un numar valid");
         }
+    }
+
+    /*
+        Database related operations
+     */
+    @Override
+    public Account toObjectFromDB(String[] dbRow, Object... services) {
+        ClientService cls = null;
+        CurrencyService crs = null;
+        if (services[0] instanceof ClientService) cls = (ClientService) services[0];
+        if (services[1] instanceof CurrencyService) crs = (CurrencyService) services[1];
+        Integer id = Integer.parseInt(dbRow[0]);
+        LocalDateTime creationDate = LocalDateTime.parse(dbRow[1]);
+        Double balance = Double.parseDouble(dbRow[2]);
+        Integer clientID = Integer.parseInt(dbRow[3]);
+        Integer currencyID = Integer.parseInt(dbRow[4]);
+        CreditCard creditCard = null;
+        Client client = cls.getElementById(clientID);
+        Currency currency = crs.getElementById(currencyID);
+        return new Account(id, creationDate, balance, client, currency, creditCard);
+    }
+
+    @Override
+    public String[] toDBString(Account obj) {
+        return new String[] {
+                obj.getID().toString(),
+                obj.getCreationDate().toString(),
+                obj.getBalance().toString(),
+                obj.getClient().getID().toString(),
+                obj.getAccountCurrency().getID().toString(),
+                null
+        };
+    }
+
+    @Override
+    public Account getElementById(Integer id) {
+        /*
+         Ceva similiar cu Maybe din Haskell, daca gaseste un client, atunci pastreaza referinta lui, daca nu, pastreaza null,
+         exact ca si Just si Nothing
+        */
+        Optional<Account> maybeAccount =
+                clientAccounts.stream()
+                        .filter(account -> account.getID().equals(id))
+                        .findFirst();
+        return maybeAccount.orElse(null);
     }
 }

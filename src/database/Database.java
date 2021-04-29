@@ -32,10 +32,10 @@ public class Database {
 
     public List<Currency> createCurrencies() {
         List<Currency> db = new ArrayList<>();
-        db.add(new Currency("Lei", "RON"));
-        db.add(new Currency("Euro", "EUR"));
-        db.add(new Currency("Dolari", "USD"));
-        db.add(new Currency("Lire Sterline", "GBP"));
+        db.add(new Currency(0,"Lei", "RON"));
+        db.add(new Currency(1,"Euro", "EUR"));
+        db.add(new Currency(2,"Dolari", "USD"));
+        db.add(new Currency(3,"Lire Sterline", "GBP"));
         return db;
     }
 

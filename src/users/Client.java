@@ -41,6 +41,8 @@ public class Client extends Person {
 
     public Set<Transaction> getTransactions() { return transactions; }
 
+    public String getClientType() { return clientType; }
+
     @Override
     public String toString() {
         return ("Informatii despre clientul " + name + ":\n"
@@ -51,6 +53,4 @@ public class Client extends Person {
                 + "\nNumarul de credite bancare deschise: " + credits.size()
                 + "\nNumarul de transferuri efectuate: " + transactions.size());
     }
-
-
 }

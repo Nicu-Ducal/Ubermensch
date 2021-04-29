@@ -12,10 +12,10 @@ public class Credit extends Contract implements Comparable<Credit> {
     private Double sumaDeRestituit;
     private LocalDateTime closingDate;
 
-    public Credit(Client client, Currency accountCurrency, Double dobanda, String type, Double sumaImprumutata) {
-        super(client, accountCurrency, dobanda, type, "Pending approval. Wait for an employee to approve your request");
+    public Credit(Integer id, Client client, Currency accountCurrency, Double dobanda, String type, Double sumaImprumutata, Double sumaRestituita) {
+        super(id, client, accountCurrency, dobanda, type, "Pending approval. Wait for an employee to approve your request");
         this.sumaImprumutata = sumaImprumutata;
-        this.sumaRestituita = 0.0;
+        this.sumaRestituita = sumaRestituita;
         this.sumaDeRestituit = sumaImprumutata * (1 + dobanda);
     }
 

@@ -3,13 +3,17 @@ package features;
 import java.util.Objects;
 
 public class Currency {
+    private Integer id;
     private final String name;
     private final String international;
 
-    public Currency(String name, String international) {
+    public Currency(Integer id, String name, String international) {
+        this.id = id;
         this.name = name;
         this.international = international;
     }
+
+    public Integer getID() { return id; }
 
     public String getName() {
         return this.name;

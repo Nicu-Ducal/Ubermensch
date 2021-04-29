@@ -10,8 +10,8 @@ public class Deposit extends Contract implements Comparable<Deposit> {
     private LocalDateTime expirationDate;
     private Double sumaDepusa;
 
-    public Deposit(Client client, Currency accountCurrency, Double dobanda, String type, Double sumaDepusa) {
-        super(client, accountCurrency, dobanda, type, "Pending approval. Wait for an employee to approve your request");
+    public Deposit(Integer id, Client client, Currency accountCurrency, Double dobanda, String type, Double sumaDepusa) {
+        super(id, client, accountCurrency, dobanda, type, "Pending approval. Wait for an employee to approve your request");
         this.sumaDepusa = sumaDepusa;
         this.expirationDate = this.creationDate.plusYears(1);
     }

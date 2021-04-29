@@ -1,5 +1,6 @@
 package services;
 
+import database.IDatabaseOperations;
 import features.Credit;
 import features.Currency;
 import features.interfaces.Numeric;
@@ -7,15 +8,17 @@ import users.Client;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
-public class CreditService {
+public class CreditService implements IDatabaseOperations<Credit> {
     List<Credit> clientCredits;
     Credit selectedCredit;
     HashMap<String, Double> typeDobanda;
     public final Double MAX_CREDIT_AMMOUNT = 50000000.0;
     public final int CREDITS_LIMIT = 5;
     private static Scanner scan = new Scanner(System.in);
+    private Integer lastId = 0;
 
 
     public CreditService(HashMap<String, Double> typeDobanda) {
@@ -91,7 +94,7 @@ public class CreditService {
         Double balance = Numeric.getBalance(scan, MAX_CREDIT_AMMOUNT);
         String type = printAndGetType();
         Double dobanda = typeDobanda.get(type);
-        Credit newCredit = new Credit(cls.getCurrentClient(), currency, dobanda, type, balance);
+        Credit newCredit = new Credit(lastId++, cls.getCurrentClient(), currency, dobanda, type, balance, 0.0);
         clientCredits.add(newCredit);
         System.out.println("Creditul a fost deschis cu succes!");
     }
@@ -121,5 +124,52 @@ public class CreditService {
                 return type;
             System.out.println("Introduceti un tip de deposit din cele de mai sus!");
         }
+    }
+
+    /*
+        Database related operations
+     */
+    @Override
+    public Credit toObjectFromDB(String[] dbRow, Object... services) {
+        ClientService cls = null;
+        CurrencyService crs = null;
+        if (services[0] instanceof ClientService) cls = (ClientService) services[0];
+        if (services[1] instanceof CurrencyService) crs = (CurrencyService) services[1];
+        int id = Integer.parseInt(dbRow[0]);
+        Integer clientID = Integer.parseInt(dbRow[1]);
+        Integer currencyID = Integer.parseInt(dbRow[2]);
+        Client client = cls.getElementById(clientID);
+        Currency currency = crs.getElementById(currencyID);
+        Double dobanda = Double.parseDouble(dbRow[3]);
+        String type = dbRow[4];
+        Double sumaImprumutata = Double.parseDouble(dbRow[5]);
+        Double sumaRestituita = Double.parseDouble(dbRow[6]);
+        return new Credit(id, client, currency, dobanda, type, sumaImprumutata, sumaRestituita);
+    }
+
+    @Override
+    public String[] toDBString(Credit obj) {
+        return new String[] {
+                obj.getID().toString(),
+                obj.getClient().getID().toString(),
+                obj.getAccountCurrency().getID().toString(),
+                obj.getDobanda().toString(),
+                obj.getType(),
+                obj.getSumaImprumutata().toString(),
+                obj.getSumaRestituita().toString()
+        };
+    }
+
+    @Override
+    public Credit getElementById(Integer id) {
+        /*
+         Ceva similiar cu Maybe din Haskell, daca gaseste un client, atunci pastreaza referinta lui, daca nu, pastreaza null,
+         exact ca si Just si Nothing
+        */
+        Optional<Credit> maybeCredit =
+                clientCredits.stream()
+                        .filter(credit -> credit.getID().equals(id))
+                        .findFirst();
+        return maybeCredit.orElse(null);
     }
 }

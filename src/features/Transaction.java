@@ -5,19 +5,23 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Transaction implements Comparable<Transaction> {
+    private Integer id;
     private Account fromAccount;
     private Account toAccount;
     private LocalDateTime transactionTime;
     private Double amount;
     private Currency currency;
 
-    public Transaction(Account fromAccount, Account toAccount, Double amount, Currency currency) {
+    public Transaction(Integer id, Account fromAccount, Account toAccount, Double amount, Currency currency) {
+        this.id = id;
         this.fromAccount = fromAccount;
         this.toAccount = toAccount;
         this.transactionTime = LocalDateTime.now();
         this.amount = amount;
         this.currency = currency;
     }
+
+    public Integer getID() { return id; }
 
     public Account getFromAccount() {
         return fromAccount;
@@ -44,12 +48,12 @@ public class Transaction implements Comparable<Transaction> {
         if (this == o) return true;
         if (!(o instanceof Transaction)) return false;
         Transaction that = (Transaction) o;
-        return fromAccount.equals(that.fromAccount) && toAccount.equals(that.toAccount) && transactionTime.equals(that.transactionTime) && amount.equals(that.amount) && currency.equals(that.currency);
+        return id.equals(that.id) && fromAccount.equals(that.fromAccount) && toAccount.equals(that.toAccount) && transactionTime.equals(that.transactionTime) && amount.equals(that.amount) && currency.equals(that.currency);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fromAccount, toAccount, transactionTime, amount, currency);
+        return Objects.hash(id, fromAccount, toAccount, transactionTime, amount, currency);
     }
 
     @Override

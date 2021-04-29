@@ -1,19 +1,19 @@
 package services;
 
+import database.IDatabaseOperations;
 import users.Client;
 import users.Person;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
-public class ClientService {
+public class ClientService implements IDatabaseOperations<Client> {
     private List<Client> clientList;
     HashSet<String> usernames;
     HashSet<String> emails;
     private Client currentClient;
     private static Scanner scan = new Scanner(System.in);
+    private Integer lastId = 0;
+
 
     public ClientService(List<Client> clientList) {
         this.clientList = clientList;
@@ -104,7 +104,7 @@ public class ClientService {
             }
             System.out.println("Introduceti un tip valid");
         }
-        clientList.add(new Client(clientList.size() + 1, username, password, name, email, tip));
+        clientList.add(new Client(lastId++, username, password, name, email, tip));
         usernames.add(username);
         emails.add(email);
         System.out.println("V-ati inregistrat cu success. Acum puteti va logati cu username-ul si parola specificate la inregistrare");
@@ -133,5 +133,43 @@ public class ClientService {
                 return (Client) otherUsers.get(idx - 1);
             System.out.println("Introduceti un numar valid");
         }
+    }
+
+    /*
+        Database related operations
+     */
+    @Override
+    public Client toObjectFromDB(String[] dbRow, Object... services) {
+        int id = Integer.parseInt(dbRow[0]);
+        String username = dbRow[1];
+        String password = dbRow[2];
+        String name = dbRow[3];
+        String email = dbRow[4];
+        String clientType = dbRow[5];
+        return new Client(id, username, password, name, email, clientType);
+    }
+
+    @Override
+    public String[] toDBString(Client cl) {
+        return new String[] {
+                cl.getID().toString(),
+                cl.getUsername(),
+                cl.getPassword(),
+                cl.getEmail(),
+                cl.getClientType()
+        };
+    }
+
+    @Override
+    public Client getElementById(Integer id) {
+        /*
+         Ceva similiar cu Maybe din Haskell, daca gaseste un client, atunci pastreaza referinta lui, daca nu, pastreaza null,
+         exact ca si Just si Nothing
+        */
+        Optional<Client> maybeClient =
+                clientList.stream()
+                .filter(client -> client.getID().equals(id))
+                .findFirst();
+        return maybeClient.orElse(null);
     }
 }

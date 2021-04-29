@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public abstract class Contract implements Rate {
+    protected Integer id;
     protected Client client;
     protected LocalDateTime creationDate;
     protected Currency accountCurrency;
@@ -15,7 +16,8 @@ public abstract class Contract implements Rate {
     protected LocalDateTime lastBalanceUpdate;
     protected String status;
 
-    public Contract(Client client, Currency accountCurrency, Double dobanda, String type, String status) {
+    public Contract(Integer id, Client client, Currency accountCurrency, Double dobanda, String type, String status) {
+        this.id = id;
         this.client = client;
         this.accountCurrency = accountCurrency;
         this.creationDate = LocalDateTime.now();
@@ -25,14 +27,13 @@ public abstract class Contract implements Rate {
         this.type = type;
     }
 
+    public Integer getID() { return id; }
+
     public Client getClient() {
         return client;
     }
 
-    public LocalDateTime getCreationDate() {
-
-        return creationDate;
-    }
+    public LocalDateTime getCreationDate() { return creationDate; }
 
     public Currency getAccountCurrency() {
         return accountCurrency;
@@ -67,7 +68,7 @@ public abstract class Contract implements Rate {
         if (this == o) return true;
         if (!(o instanceof Contract)) return false;
         Contract contract = (Contract) o;
-        return client.equals(contract.client) && creationDate.equals(contract.creationDate) && accountCurrency.equals(contract.accountCurrency) && dobanda.equals(contract.dobanda) && type.equals(contract.type) && lastBalanceUpdate.equals(contract.lastBalanceUpdate) && status.equals(contract.status);
+        return id.equals(contract.id) && client.equals(contract.client) && creationDate.equals(contract.creationDate) && accountCurrency.equals(contract.accountCurrency) && dobanda.equals(contract.dobanda) && type.equals(contract.type) && lastBalanceUpdate.equals(contract.lastBalanceUpdate) && status.equals(contract.status);
     }
 
     @Override
