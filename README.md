@@ -74,3 +74,6 @@ public class CurrencyService
 public class BankApp
 ```
 
+### Cerințele pentru etapa II:
+
+CSV RW Operations: Source `https://stackabuse.com/reading-and-writing-csvs-in-java/`

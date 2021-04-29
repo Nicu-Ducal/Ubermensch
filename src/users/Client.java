@@ -11,12 +11,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class Client extends Person {
+    private Integer id;
     private String clientType;
     private List<Account> accounts;
     private List<Deposit> deposits;
     private List<Credit> credits;
     private Set<Transaction> transactions;
-
 
     public Client(int id, String username, String password, String name, String email, String clientType) {
         super(id, username, password, name, email);
@@ -51,4 +51,6 @@ public class Client extends Person {
                 + "\nNumarul de credite bancare deschise: " + credits.size()
                 + "\nNumarul de transferuri efectuate: " + transactions.size());
     }
+
+
 }

@@ -1,11 +1,12 @@
 package features;
 
+import database.RWOperations;
 import users.Client;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Account {
+public class Account implements RWOperations<Account> {
     private Client client;
     private LocalDateTime creationDate;
     private Currency accountCurrency;
@@ -75,5 +76,19 @@ public class Account {
         }
         linkedCard = new CreditCard(this);
         return true;
+    }
+
+    @Override
+    public Account toObjectFromDB(String[] dbRow) {
+        Integer clientID = Integer.parseInt(dbRow[0]);
+        return null;
+    }
+
+    @Override
+    public String[] toDBString() {
+        String[] dbRow = {
+                client.getName()
+        };
+        return dbRow;
     }
 }
