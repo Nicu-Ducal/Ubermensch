@@ -2,40 +2,24 @@ package database;
 
 import features.Currency;
 import features.ExchangeCurrency;
-import users.Client;
-import users.Employee;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class Database {
-    public static Database databaseInstance = null;
+    private static Database dbInstance = null;
 
     private Database() {}
 
     public static Database getInstance() {
-        if (databaseInstance == null)
-            databaseInstance = new Database();
-        return databaseInstance;
+        if (dbInstance == null)
+            dbInstance = new Database();
+        return dbInstance;
     }
 
-    public List<Client> createClients() {
-        List<Client> db = new ArrayList<>();
-        db.add(new Client(1, "nicu-ducal", "parola", "Nicu Ducal", "nicu@gmail.com", "Fizica"));
-        db.add(new Client(1, "user-doi", "123445", "Utilizator 2", "user2@gmail.com", "Juridica"));
-        db.add(new Client(1, "melon_usk", "tesla", "Melon Usk", "tesla@yahoo.com", "Juridica"));
-        db.add(new Client(1, "beffjezos", "amazon", "Beff Jezos", "beff@amazon.com", "Fizica"));
-        db.add(new Client(1, "tonalt.drump", "maga2020", "Tonalt Drump", "donaldduck@gmail.com", "Fizica"));
-        return db;
-    }
+    public void loadDatabase() {
 
-    public List<Employee> createEmployees() {
-        List<Employee> db = new ArrayList<>();
-        db.add(new Employee(1, "angajat1", "parola1", "Seful firmei", "boss@gmail.com", "Manager"));
-        db.add(new Employee(2, "angajat2", "parola2", "Anagajatul lunii", "bestworker@gmail.com", "Angajat"));
-        db.add(new Employee(3, "angajat3", "parola3", "Angajatul anului", "bestyearworker@gmail.com", "Angajat"));
-        return db;
     }
 
     public List<Currency> createCurrencies() {

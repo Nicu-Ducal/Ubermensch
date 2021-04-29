@@ -6,7 +6,7 @@ import java.io.*;
  * Class used for write operations to .csv (comma-separated values) files
  */
 public class CSVWriter {
-    public static CSVWriter writerInstance = null;
+    private static CSVWriter writerInstance = null;
 
     private CSVWriter() {}
 

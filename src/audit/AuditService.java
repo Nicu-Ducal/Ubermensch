@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class AuditService {
-    public static AuditService auditInstance = null;
+    private static AuditService auditInstance = null;
     private DateTimeFormatter ft = null;
     private final String LOGS_FILE = Paths.get(System.getProperty("user.dir"), "src", "audit", "audit_logs.csv").toString();
     // Non OS Friendly Version: System.getProperty("user.dir") + "/src/audit/audit_logs.csv";

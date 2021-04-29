@@ -10,7 +10,7 @@ import java.util.List;
  * Class used for read operations from .csv (comma-separated values) files
  */
 public class CSVReader {
-    public static CSVReader readerInstance = null;
+    private static CSVReader readerInstance = null;
 
     private CSVReader() {}
 
@@ -35,6 +35,21 @@ public class CSVReader {
             buffReader.close();
             csvFile.close();
             return fileContent;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    public <T> List<T> readData(String path, IDatabaseOperations<T> service, Object... otherServices) throws Exception {
+        try {
+            List<String[]> fileContent = readFile(path);
+            List<T> dbContent = new ArrayList<T>();
+            for (String[] line: fileContent) {
+                T obj = service.toObjectFromDB(line, otherServices);
+                dbContent.add(obj);
+            }
+            return dbContent;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;

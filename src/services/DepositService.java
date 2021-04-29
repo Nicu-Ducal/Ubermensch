@@ -12,13 +12,13 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class DepositService implements IDatabaseOperations<Deposit> {
-    public static DepositService depositServiceInstance = null;
+    private static DepositService depositServiceInstance = null;
     List<Deposit> clientDeposits;
     Deposit selectedDeposit;
     HashMap<String, Double> typeDobanda;
     private static Scanner scan = new Scanner(System.in);
-    public final int DEPOSITS_LIMIT = 10;
-    public final Double MAX_DEPOSIT_BALANCE = 100000000.0;
+    private final int DEPOSITS_LIMIT = 10;
+    private final Double MAX_DEPOSIT_BALANCE = 100000000.0;
     private Integer lastId = 0;
 
     private DepositService() { setNull(); }

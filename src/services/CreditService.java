@@ -12,12 +12,12 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class CreditService implements IDatabaseOperations<Credit> {
-    public static CreditService creditServiceInstance = null;
+    private static CreditService creditServiceInstance = null;
     List<Credit> clientCredits;
     Credit selectedCredit;
     HashMap<String, Double> typeDobanda;
-    public final Double MAX_CREDIT_AMOUNT = 50000000.0;
-    public final int CREDITS_LIMIT = 5;
+    private final Double MAX_CREDIT_AMOUNT = 50000000.0;
+    private final int CREDITS_LIMIT = 5;
     private static Scanner scan = new Scanner(System.in);
     private Integer lastId = 0;
 

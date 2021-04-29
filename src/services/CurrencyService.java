@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class CurrencyService implements IDatabaseOperations<Currency> {
-    public static CurrencyService currencyServiceInstance = null;
+    private static CurrencyService currencyServiceInstance = null;
     private final List<Currency> currencies;
     HashMap<ExchangeCurrency, Double> exchangeRates;
 

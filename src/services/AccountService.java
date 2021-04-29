@@ -18,7 +18,7 @@ public class AccountService implements IDatabaseOperations<Account> {
     private Account selectedAccount;
     private static Scanner scan = new Scanner(System.in);
     private final int ACCOUNTS_LIMIT = 10;
-    public final Double MAX_ACCOUNT_BALANCE = 1000000.0;
+    private final Double MAX_ACCOUNT_BALANCE = 1000000.0;
     private Integer lastId = 0;
 
 
