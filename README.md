@@ -3,9 +3,11 @@
 Aplicatie bancara realizata in Java, utilizand concepte de Programare Orientată pe Obiecte (OOP), design patterns și baze de date. Momentan este o aplicatie pentru consola, eventual as putea face upgrade la un GUI simplu.  
 
 ## TODO
-1. Să definesc (sau nu) clasa ```Employee```
+1. Să adaug Exceptii custom
 2. Să completez funcționalitatea clasei ```BankApp``` la rularea aplicatiei.
-3. Să elimin unele redundanțe
+3. Să adaug GET Requests/Fetch catre un API care sa-mi permita sa colectez informatii despre exchange rates
+ale valutelor din `Currency`
+4. Partea III a proiectului + CRUD pe 4 clase (Client, Account, Deposit?, Credit?)
    
 ### Descrierea aplicației
 Utilizatorii aplicației pot fi clienți ai băncii sau angajații acesteia. Mai întâi, pentru a efectua
@@ -75,7 +77,31 @@ public class BankApp
 ```
 
 ### Cerințele pentru etapa II:
-
-CSV RW Operations: Source `https://stackabuse.com/reading-and-writing-csvs-in-java/`
-
-TODO: `TransactionService`
+1. Extindeți proiectul din prima etapă prin realizarea presistenței, utilizând fișiere.
+   * Se vor realiza fișiere de tip csv pentru cel puțin 4 dintre clasele definite în 
+   prima etapă:
+   ```
+   Client.csv
+   Account.csv
+   Deposit.csv
+   Credit.csv
+   Transaction.csv
+   Currency.csv
+   ```
+   * Se vor realiza servicii singleton generice pentru scrierea și citirea din fișiere:
+   ```java
+   public class CSVReader;
+   public class CSVWriter;
+   ```
+   * La pornirea programului, se vor încărca datele din fișiere utilizând servicile create:
+   ```java
+   // In aceasta clasa se contine aceasta functionalitate de load si store a datelor in fisiere
+   public class Database;
+   ```
+2. Realizarea unui serviciu de audit care să scrie într-un fișier de tip csv de fiecare dată când
+este executată una dintre acțiunile descrise în prima etapă. Structura fișierulu: nume_acțiune, timestamp
+```java
+public class AuditService;
+```
+Surse ajutătoare: 
+* CSV Read and Write Operations - `https://stackabuse.com/reading-and-writing-csvs-in-java/`
