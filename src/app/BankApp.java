@@ -1,5 +1,6 @@
 package app;
 
+import audit.AuditService;
 import database.Database;
 import services.*;
 
@@ -14,6 +15,7 @@ public class BankApp {
     private static BankApp bank = null;
     private static Scanner scan = new Scanner(System.in);
 
+    private AuditService auditService;
     private ClientService clientService;
     private AccountService accountService;
     private CurrencyService currencyService;
@@ -25,6 +27,7 @@ public class BankApp {
 
     private BankApp() {
         Database db = new Database();
+        auditService = AuditService.getInstance();
         clientService = new ClientService(db.createClients());
         accountService = new AccountService();
         currencyService = new CurrencyService(db.createCurrencies(), db.createExchanges());
@@ -62,7 +65,7 @@ public class BankApp {
         clip.stop();
     }
 
-    private void executeCommand(String cmd) {
+    private boolean executeCommand(String cmd) {
         Boolean isLoggedIn = clientService.getCurrentClient() != null;
         if (cmd.equals("exit")) {
             running = false;
@@ -138,19 +141,22 @@ public class BankApp {
             stopMusic(music);
         } else {
             System.out.println("Invalid command");
+            return false;
         }
+        return true;
     }
 
     public void run() {
         System.out.println("Welcome to Ubermensch. Log in or register a new account to continue");
         String appName = "Ubermensch>";
         String loggedInName;
-        String input;
+        String action;
         while (running) {
             loggedInName = clientService.getCurrentClient() != null ? clientService.getCurrentClient().getUsername() + ">" : "";
             System.out.print(appName + loggedInName + " ");
-            input = scan.nextLine();
-            executeCommand(input);
+            action = scan.nextLine().trim();
+            boolean done = executeCommand(action);
+            if (done) auditService.LogAction(action);
         }
     }
 }
