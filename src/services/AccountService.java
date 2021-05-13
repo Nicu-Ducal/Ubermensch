@@ -1,5 +1,7 @@
 package services;
 
+import database.CRUD;
+import database.Database;
 import database.IDatabaseOperations;
 import features.Account;
 import features.CreditCard;
@@ -7,13 +9,15 @@ import features.Currency;
 import features.interfaces.Numeric;
 import users.Client;
 
+import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-public class AccountService implements IDatabaseOperations<Account> {
+public class AccountService implements CRUD<Account>, IDatabaseOperations<Account> {
     private static AccountService accountServiceInstance = null;
     private List<Account> accounts;
     private List<Account> clientAccounts;
@@ -83,8 +87,8 @@ public class AccountService implements IDatabaseOperations<Account> {
         System.out.print("Introduceti suma de bani: ");
         Double balance = Numeric.getBalance(scan, MAX_ACCOUNT_BALANCE);
 
-        Integer id = accounts.size() == 0 ? 1 : accounts.get(accounts.size() - 1).getID() + 1;
-        Account newAccount = new Account(id, cls.getCurrentClient(), currency, balance);
+        int newId = create(new Account(-1, cls.getCurrentClient(), currency, balance));
+        Account newAccount = read(newId);
         clientAccounts.add(newAccount);
         accounts.add(newAccount);
         System.out.println("Operatiune realizata cu succes. Doriti sa fie eliberat si un card bancar pentru contul creat? (y/n)");
@@ -113,6 +117,9 @@ public class AccountService implements IDatabaseOperations<Account> {
         }
         clientAccounts.remove(selectedAccount);
         accounts.remove(selectedAccount);
+        delete(selectedAccount.getID());
+        // Delete the transactions with this accounts participation
+        TransactionService.getInstance().deleteTransactionsOfAccount(selectedAccount.getID());
         selectedAccount = null;
         System.out.println("Contul a fost sters cu succes");
     }
@@ -162,7 +169,9 @@ public class AccountService implements IDatabaseOperations<Account> {
                     System.out.println(e.getMessage());
                     return;
                 }
+
                 selectedAccount.addMoney(moneyAmount);
+                update(selectedAccount.getID(), selectedAccount);
                 System.out.println("Contul dvs. a fost suplinit cu " + moneyAmount + " " + selectedAccount.getAccountCurrency().getName());
             } else
                 System.out.println("Introduceti o valoare numerica pozitiva pentru suplinirea contului");
@@ -224,8 +233,8 @@ public class AccountService implements IDatabaseOperations<Account> {
     public List<Account> getCollection() { return accounts; }
 
     @Override
-    public void load(List<Account> accounts) {
-        this.accounts = accounts;
+    public void load() {
+        this.accounts = readAll();
     }
 
     @Override
@@ -272,5 +281,94 @@ public class AccountService implements IDatabaseOperations<Account> {
                 .filter(account -> account.getClient().getID().equals(clientID))
                 .collect(Collectors.toList());
         return clAccounts;
+    }
+
+    /* CRUD Operations */
+    @Override
+    public int create(Account obj) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String insertQuery = "insert into account values (null, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, obj.getCreationDate().toString());
+            preparedStatement.setDouble(2, obj.getBalance());
+            preparedStatement.setInt(3, obj.getClient().getID());
+            preparedStatement.setInt(4, obj.getAccountCurrency().getID());
+            preparedStatement.setInt(5, 0);
+
+            preparedStatement.executeUpdate();
+            ResultSet genKeys = preparedStatement.getGeneratedKeys();
+            int id = -1;
+            if (genKeys.next()) id = genKeys.getInt(1);
+            preparedStatement.close();
+
+            return id;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @AccountService/create: " + sqle.getMessage());
+            return -1;
+        }
+    }
+
+    @Override
+    public List<Account> readAll() {
+        List<Account> databaseAccounts = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String selectQuery = "select id from account";
+            ResultSet queryResult = connection.prepareStatement(selectQuery).executeQuery();
+            while (queryResult.next()) {
+                int id = queryResult.getInt("id");
+                databaseAccounts.add(read(id));
+            }
+            return databaseAccounts;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @AccountService/readALl: " + sqle.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public Account read(int accountId) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String selectQuery = "select * from account where id = " + Integer.toString(accountId);
+            ResultSet queryResult = connection.prepareStatement(selectQuery).executeQuery();
+            Account account = null;
+            while (queryResult.next()) {
+                int id = queryResult.getInt("id");
+                LocalDateTime creationDate = LocalDateTime.parse(queryResult.getString("creationDate"));
+                Double balance = queryResult.getDouble("balance");
+                int clientID = queryResult.getInt("clientID");
+                int currencyID = queryResult.getInt("currencyID");
+                int creditCardID = queryResult.getInt("creditCardID");
+                CreditCard creditCard = null;
+                Client client = ClientService.getInstance().getElementById(clientID);
+                Currency currency = CurrencyService.getInstance().getElementById(currencyID);
+                account = new Account(id, creationDate, balance, client, currency, creditCard);
+            }
+            return account;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @AccountService/read: " + sqle.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public void update(int id, Account newObj) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword());
+             Statement statement = connection.createStatement()) {
+            String updateQuery = "update account set balance = " + newObj.getBalance() + " where id = " + id;
+            statement.executeUpdate(updateQuery);
+            } catch (SQLException sqle) {
+            System.out.println("SQL Exception @AccountService/update: " + sqle.getMessage());
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword());
+             Statement statement = connection.createStatement()) {
+            String deleteQuery = "delete from account where id = " + id;
+            statement.executeUpdate(deleteQuery);
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @AccountService/delete: " + sqle.getMessage());
+        }
     }
 }

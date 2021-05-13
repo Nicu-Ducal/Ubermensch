@@ -72,15 +72,32 @@ public class BankApp {
             running = false;
             System.out.println("Thanks for using the app!");
         } else if (cmd.equals("login")) {
-            clientService.LogIn(accountService, depositService, creditService, transactionService);
+            clientService.LogIn();
         } else if (cmd.equals("logout")) {
-            clientService.LogOut(accountService, depositService, creditService, transactionService);
+            clientService.LogOut();
         } else if (cmd.equals("register")) {
             clientService.Register();
+        } else if (cmd.equals("change-user-account")) {
+            clientService.ChangeAccount();
+        } else if (cmd.equals("delete-user-account")) {
+            clientService.DeleteAccount();
         } else if (cmd.equals("show-info")) {
             clientService.printClientInfo();
-        } else if (cmd.equals("show-accounts")) {
-            accountService.showAccountsInfo();
+        } else if (cmd.split(" ")[0].equals("show") && cmd.split(" ").length == 2) {
+            String type = cmd.split(" ")[1];
+            switch (type) {
+                case "accounts":
+                    accountService.showAccountsInfo();
+                    break;
+                case "deposits":
+                    depositService.showDepositsInfo();
+                    break;
+                case "credits":
+                    creditService.showCreditsInfo();
+                    break;
+                default:
+                    System.out.println("Invalid command");
+            }
         } else if (cmd.split(" ")[0].equals("open") && cmd.split(" ").length == 2) {
             String type = cmd.split(" ")[1];
             try {
@@ -115,9 +132,22 @@ public class BankApp {
                 default:
                     System.out.println("Invalid command");
             }
-        } else if (cmd.startsWith("select-account") && cmd.split(" ")[0].equals("select-account")) {
-            String index = cmd.split(" ")[1];
-            accountService.selectAccount(index);
+        } else if (cmd.split(" ")[0].equals("select") && cmd.split(" ").length == 3) {
+            String type = cmd.split(" ")[1];
+            String index = cmd.split(" ")[2];
+            switch (type) {
+                case "account":
+                    accountService.selectAccount(index);
+                    break;
+                case "deposit":
+                    depositService.selectDeposit(index);
+                    break;
+                case "credit":
+                    creditService.selectCredit(index);
+                    break;
+                default:
+                    System.out.println("Invalid command");
+            }
         } else if (cmd.equals("show-account-info")) {
             accountService.printExtrasDeCont();
         } else if (cmd.equals("show-deposit-info")) {
@@ -132,6 +162,10 @@ public class BankApp {
             String amount = cmd.split(" ")[1];
             String valuta = cmd.split(" ")[2];
             accountService.withdrawBalance(amount, valuta, currencyService);
+        } else if (cmd.startsWith("pay-credit") && cmd.split(" ")[0].equals("pay-credit") && cmd.split(" ").length == 3) {
+            String amount = cmd.split(" ")[1];
+            String valuta = cmd.split(" ")[2];
+            creditService.payCredit(amount, valuta);
         } else if (cmd.equals("transfer-money")) {
             transactionService.makeTransaction(clientService, accountService, currencyService);
         } else if (cmd.equals("show-transfers")) {
@@ -161,8 +195,5 @@ public class BankApp {
             boolean done = executeCommand(action);
             if (done) auditService.LogAction(action);
         }
-
-        // Store the database
-        db.storeDatabase();
     }
 }

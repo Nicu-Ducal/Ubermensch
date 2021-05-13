@@ -1,5 +1,6 @@
 package services;
 
+import database.Database;
 import database.IDatabaseOperations;
 import features.Account;
 import features.Currency;
@@ -7,11 +8,9 @@ import features.Transaction;
 import features.interfaces.Numeric;
 import users.Client;
 
+import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TransactionService implements IDatabaseOperations<Transaction> {
@@ -64,31 +63,32 @@ public class TransactionService implements IDatabaseOperations<Transaction> {
         Account toAccount = acs.selectAccountFromClient(toClient);
         System.out.print("Introduceti suma pe care doriti sa o transferati: ");
         Double amount = Numeric.getBalance(scan, MAX_TRANSACTION_VALUE);
-        Currency currency = crs.selectCurrency();
         try {
             Double convertedAmount = crs.convert(amount, acs.getSelectedAccount().getAccountCurrency(), toAccount.getAccountCurrency());
-            acs.withdrawBalance(amount.toString(), currency.getInternational(), crs);
+            if (acs.getSelectedAccount().getBalance() - convertedAmount < 0) {
+                System.out.println("Nu aveti suficienti bani pe cont pentru a efectua transferul");
+                return;
+            }
+            acs.getSelectedAccount().withdrawMoney(amount);
             toAccount.addMoney(convertedAmount);
+
+            // Update the accounts' balances after transactions
+            AccountService.getInstance().update(AccountService.getInstance().getSelectedAccount().getID(), AccountService.getInstance().getSelectedAccount());
+            AccountService.getInstance().update(toAccount.getID(), toAccount);
+
             System.out.println("Transferul a fost efectuat cu succes");
-            addTransaction(acs.getSelectedAccount(), toAccount, amount, currency);
+            addTransaction(acs.getSelectedAccount(), toAccount, amount, acs.getSelectedAccount().getAccountCurrency());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void addTransaction(Account from, Account other, Double amount, Currency currency) {
-        Integer id = transactions.size() == 0 ? 1 : transactions.get(transactions.size() - 1).getID() + 1;
-        Transaction trans = new Transaction(id, from, other, amount, currency, null);
+        int id = create(new Transaction(-1, from, other, amount, currency, null));
+        Transaction trans = read(id);
         clientTransactions.add(trans);
         other.getClient().getTransactions().add(trans);
         transactions.add(trans);
-    }
-
-    public void clearTransactions() {
-        if (clientTransactions == null) {
-            System.out.println("Trebuie sa va logati pentru a putea sterge tranzactiile");
-        }
-        clientTransactions.clear();
     }
 
     /*
@@ -99,8 +99,8 @@ public class TransactionService implements IDatabaseOperations<Transaction> {
     public List<Transaction> getCollection() { return transactions; }
 
     @Override
-    public void load(List<Transaction> transactions) {
-        this.transactions = transactions;
+    public void load() {
+        this.transactions = readAll();
     }
 
     @Override
@@ -148,5 +148,94 @@ public class TransactionService implements IDatabaseOperations<Transaction> {
                         .filter(transaction -> transaction.getFromAccount().getClient().getID().equals(clientID) || transaction.getToAccount().getClient().getID().equals(clientID))
                         .collect(Collectors.toList());
         return clTransactions;
+    }
+
+    /* CRD Operations */
+    public int create(Transaction obj) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String insertQuery = "insert into transaction values (null, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, obj.getFromAccount().getID());
+            preparedStatement.setInt(2, obj.getToAccount().getID());
+            preparedStatement.setDouble(3, obj.getAmount());
+            preparedStatement.setInt(4, obj.getCurrency().getID());
+            preparedStatement.setString(5, obj.getTransactionTime().toString());
+
+            preparedStatement.executeUpdate();
+            ResultSet genKeys = preparedStatement.getGeneratedKeys();
+            int id = -1;
+            if (genKeys.next()) id = genKeys.getInt(1);
+            preparedStatement.close();
+
+            return id;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @TransactionService/create: " + sqle.getMessage());
+            return -1;
+        }
+    }
+
+    public List<Transaction> readAll() {
+        List<Transaction> databaseTransactions = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String selectQuery = "select id from transaction";
+            ResultSet queryResult = connection.prepareStatement(selectQuery).executeQuery();
+            while (queryResult.next()) {
+                int id = queryResult.getInt("id");
+                databaseTransactions.add(read(id));
+            }
+            return databaseTransactions;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @TransactionService/readALl: " + sqle.getMessage());
+            return null;
+        }
+    }
+
+    public Transaction read(int transactionId) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String selectQuery = "select * from transaction where id = " + Integer.toString(transactionId);
+            ResultSet queryResult = connection.prepareStatement(selectQuery).executeQuery();
+            Transaction transaction = null;
+            while (queryResult.next()) {
+                int id = queryResult.getInt("id");
+                int accountFromID = queryResult.getInt("accountFromID");
+                int accountToID = queryResult.getInt("accountToID");
+                Double amount = queryResult.getDouble("amount");
+                int currencyID = queryResult.getInt("currencyID");
+                LocalDateTime transactionTime = LocalDateTime.parse(queryResult.getString("transactionTime"));
+
+                Account accountFrom = AccountService.getInstance().getElementById(accountFromID);
+                Account accountTo = AccountService.getInstance().getElementById(accountToID);
+                Currency currency = CurrencyService.getInstance().getElementById(currencyID);
+                transaction = new Transaction(id, accountFrom, accountTo, amount, currency, transactionTime);
+            }
+            return transaction;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @TransactionService/read: " + sqle.getMessage());
+            return null;
+        }
+    }
+
+    public void delete(int id) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword());
+             Statement statement = connection.createStatement()) {
+            String deleteQuery = "delete from transaction where id = " + id;
+            statement.executeUpdate(deleteQuery);
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @TransactionService/delete: " + sqle.getMessage());
+        }
+    }
+
+    public void deleteTransactionsOfAccount(int id) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword());
+             Statement statement = connection.createStatement()) {
+            String deleteQuery = "delete from transaction where accountFromID = " + id + " or accountToID =" + id;
+            statement.executeUpdate(deleteQuery);
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @TransactionService/delete: " + sqle.getMessage());
+        }
+        // Reset transactions
+        load();
+        ClientService.getInstance().setTransactions();
+        this.clientTransactions = ClientService.getInstance().getCurrentClient().getTransactions();
     }
 }

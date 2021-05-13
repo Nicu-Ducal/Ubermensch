@@ -1,20 +1,19 @@
 package services;
 
-import database.CSVReader;
+import database.CRUD;
+import database.Database;
 import database.IDatabaseOperations;
 import features.Credit;
 import features.Currency;
 import features.interfaces.Numeric;
 import users.Client;
 
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class CreditService implements IDatabaseOperations<Credit> {
+public class CreditService implements CRUD<Credit>, IDatabaseOperations<Credit> {
     private static CreditService creditServiceInstance = null;
     private List<Credit> credits;
     private List<Credit> clientCredits;
@@ -71,6 +70,18 @@ public class CreditService implements IDatabaseOperations<Credit> {
         else throw new IndexOutOfBoundsException("Nu exista un credit cu asa numar");
     }
 
+    public void showCreditsInfo() {
+        if (clientCredits == null) {
+            System.out.println("Nu sunteti logat pentru a afisa informatiile despre creditele dvs.");
+        } else if (clientCredits.size() == 0) {
+            System.out.println("Nu aveti nici un credit deschis");
+        } else {
+            System.out.println("Creditele bancare: ");
+            for (int i = 0; i < clientCredits.size(); i++)
+                System.out.println((i + 1) + ") " + clientCredits.get(i));
+        }
+    }
+
     public void informatiiCredit() {
         if (selectedCredit != null) selectedCredit.extras();
         else System.out.println("Selectati un credit pentru a afisa extrasul");
@@ -100,8 +111,8 @@ public class CreditService implements IDatabaseOperations<Credit> {
         Double balance = Numeric.getBalance(scan, MAX_CREDIT_AMOUNT);
         String type = printAndGetType();
         Double dobanda = typeDobanda.get(type);
-        Integer id = credits.size() == 0 ? 1 : credits.get(credits.size() - 1).getID() + 1;
-        Credit newCredit = new Credit(id, cls.getCurrentClient(), currency, dobanda, type, balance, 0.0);
+        int id = create(new Credit(-1, cls.getCurrentClient(), currency, dobanda, type, balance, 0.0, LocalDateTime.now()));
+        Credit newCredit = read(id);
         clientCredits.add(newCredit);
         credits.add(newCredit);
         System.out.println("Creditul a fost deschis cu succes!");
@@ -113,13 +124,54 @@ public class CreditService implements IDatabaseOperations<Credit> {
             return;
         }
         if (selectedCredit == null) {
-            System.out.println("Selectati un depozit pentru a-l sterge");
+            System.out.println("Selectati un credit pentru a-l sterge");
             return;
         }
+        if (selectedCredit.getSumaRestituita() < selectedCredit.getSumaDeRestituit()) {
+            System.out.println("Nu puteti inchide un credit nerambursat");
+            return;
+        }
+
         clientCredits.remove(selectedCredit);
         credits.remove(selectedCredit);
+        delete(selectedCredit.getID());
         selectedCredit = null;
         System.out.println("Creditul a fost sters cu succes");
+    }
+
+    public void payCredit(String amount, String currency) {
+        if (clientCredits == null) {
+            System.out.println("Trebuie sa fiti logat si sa aveti un Creditul selectat pentru a-l sterge");
+            return;
+        }
+        if (selectedCredit == null) {
+            System.out.println("Selectati un credit pentru a-l sterge");
+            return;
+        }
+        if (selectedCredit.getSumaRestituita() >= selectedCredit.getSumaDeRestituit()) {
+            System.out.println("Creditul este achitat");
+            return;
+        }
+
+        Currency cr = CurrencyService.getInstance().getCurrency(currency);
+        if (cr == null) {
+            System.out.println("Valuta introdusa de dvs. nu exista");
+            return;
+        }
+        if (Numeric.isNumeric(amount) && Double.parseDouble(amount) > 0.0) {
+            Double moneyAmount = Numeric.RoundTwoDecimals(Double.parseDouble(amount));
+            try {
+                moneyAmount = CurrencyService.getInstance().convert(moneyAmount, cr, selectedCredit.getAccountCurrency());
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                return;
+            }
+
+            selectedCredit.payCredit(moneyAmount);
+            update(selectedCredit.getID(), selectedCredit);
+            System.out.println("Creditul dvs. a fost rambursat cu " + moneyAmount + " " + selectedCredit.getAccountCurrency().getName());
+        } else
+            System.out.println("Introduceti o valoare numerica pozitiva pentru suplinirea creditului");
     }
 
     private String printAndGetType() {
@@ -143,17 +195,9 @@ public class CreditService implements IDatabaseOperations<Credit> {
     public List<Credit> getCollection() { return credits; }
 
     @Override
-    public void load(List<Credit> credits) {
-        this.credits = credits;
-        typeDobanda = new HashMap<>();
-        try {
-            List<String[]> data = CSVReader.getInstance().readFile(Paths.get(System.getProperty("user.dir"), "src", "database", "data", "CreditsDobanda.csv").toString());
-            for (String[] line: data) {
-                typeDobanda.put(line[0], Double.parseDouble(line[1]));
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    public void load() {
+        this.credits = readAll();
+        this.typeDobanda = readCreditDobanda();
     }
 
     @Override
@@ -167,7 +211,8 @@ public class CreditService implements IDatabaseOperations<Credit> {
         String type = dbRow[4];
         Double sumaImprumutata = Double.parseDouble(dbRow[5]);
         Double sumaRestituita = Double.parseDouble(dbRow[6]);
-        return new Credit(id, client, currency, dobanda, type, sumaImprumutata, sumaRestituita);
+        LocalDateTime creationDate = LocalDateTime.parse(dbRow[7]);
+        return new Credit(id, client, currency, dobanda, type, sumaImprumutata, sumaRestituita, creationDate);
     }
 
     @Override
@@ -179,7 +224,8 @@ public class CreditService implements IDatabaseOperations<Credit> {
                 obj.getDobanda().toString(),
                 obj.getType(),
                 obj.getSumaImprumutata().toString(),
-                obj.getSumaRestituita().toString()
+                obj.getSumaRestituita().toString(),
+                obj.getCreationDate().toString()
         };
     }
 
@@ -202,5 +248,116 @@ public class CreditService implements IDatabaseOperations<Credit> {
                         .filter(credit -> credit.getClient().getID().equals(clientID))
                         .collect(Collectors.toList());
         return clCredits;
+    }
+
+    /* CRUD Operations */
+    @Override
+    public int create(Credit obj) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String insertQuery = "insert into credit values (null, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, obj.getClient().getID());
+            preparedStatement.setInt(2, obj.getAccountCurrency().getID());
+            preparedStatement.setDouble(3, obj.getDobanda());
+            preparedStatement.setString(4, obj.getType());
+            preparedStatement.setDouble(5, obj.getSumaImprumutata());
+            preparedStatement.setDouble(6, obj.getSumaRestituita());
+            preparedStatement.setString(7, obj.getCreationDate().toString());
+
+            preparedStatement.executeUpdate();
+            ResultSet genKeys = preparedStatement.getGeneratedKeys();
+            int id = -1;
+            if (genKeys.next()) id = genKeys.getInt(1);
+            preparedStatement.close();
+
+            return id;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @CreditService/create: " + sqle.getMessage());
+            return -1;
+        }
+    }
+
+    @Override
+    public List<Credit> readAll() {
+        List<Credit> databaseCredits = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String selectQuery = "select id from credit";
+            ResultSet queryResult = connection.prepareStatement(selectQuery).executeQuery();
+            while (queryResult.next()) {
+                int id = queryResult.getInt("id");
+                databaseCredits.add(read(id));
+            }
+            return databaseCredits;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @CreditService/readALl: " + sqle.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public Credit read(int creditId) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String selectQuery = "select * from credit where id =" + Integer.toString(creditId);
+            ResultSet queryResult = connection.prepareStatement(selectQuery).executeQuery();
+            Credit credit = null;
+            while (queryResult.next()) {
+                int id = queryResult.getInt("id");
+                int clientID = queryResult.getInt("clientID");
+                int currencyID = queryResult.getInt("currencyID");
+                Double dobanda = queryResult.getDouble("dobanda");
+                String type = queryResult.getString("type");
+                Double sumaImprumutata = queryResult.getDouble("sumaImprumutata");
+                Double sumaRestituita = queryResult.getDouble("sumaRestituita");
+                LocalDateTime creationDate = LocalDateTime.parse(queryResult.getString("creationDate"));
+
+                Client client = ClientService.getInstance().getElementById(clientID);
+                Currency currency = CurrencyService.getInstance().getElementById(currencyID);
+                credit = new Credit(id, client, currency, dobanda, type, sumaImprumutata, sumaRestituita, creationDate);
+            }
+            return credit;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @CreditService/read: " + sqle.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public void update(int id, Credit newObj) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword());
+             Statement statement = connection.createStatement()) {
+            String updateQuery = "update credit set sumaRestituita = " + newObj.getSumaRestituita() + " where id = " + id;
+            statement.executeUpdate(updateQuery);
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @CreditService/update: " + sqle.getMessage());
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword());
+             Statement statement = connection.createStatement()) {
+            String deleteQuery = "delete from credit where id = " + id;
+            statement.executeUpdate(deleteQuery);
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @CreditService/delete: " + sqle.getMessage());
+        }
+    }
+
+    public HashMap<String, Double> readCreditDobanda() {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword());
+             Statement statement = connection.createStatement()) {
+            HashMap<String, Double> databaseCreditDobanda = new HashMap<>();
+            String selectQuery = "select * from creditsdobanda";
+            ResultSet result = statement.executeQuery(selectQuery);
+            while (result.next()) {
+                String name = result.getString("name");
+                Double dobanda = result.getDouble("dobanda");
+                databaseCreditDobanda.put(name, dobanda);
+            }
+            return databaseCreditDobanda;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @CreditService/readCreditDobanda: " + sqle.getMessage());
+            return null;
+        }
     }
 }

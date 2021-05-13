@@ -1,20 +1,19 @@
 package services;
 
-import database.CSVReader;
+import database.CRUD;
+import database.Database;
 import database.IDatabaseOperations;
 import features.Currency;
 import features.Deposit;
 import features.interfaces.Numeric;
 import users.Client;
 
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class DepositService implements IDatabaseOperations<Deposit> {
+public class DepositService implements CRUD<Deposit>, IDatabaseOperations<Deposit> {
     private static DepositService depositServiceInstance = null;
     private List<Deposit> deposits;
     private List<Deposit> clientDeposits;
@@ -71,6 +70,18 @@ public class DepositService implements IDatabaseOperations<Deposit> {
         else throw new IndexOutOfBoundsException("Nu exista un deposit cu asa numar");
     }
 
+    public void showDepositsInfo() {
+        if (clientDeposits == null) {
+            System.out.println("Nu sunteti logat pentru a afisa informatiile despre depozite bancare");
+        } else if (clientDeposits.size() == 0) {
+            System.out.println("Nu aveti nici un depozit deschis");
+        } else {
+            System.out.println("Depozitele bancare: ");
+            for (int i = 0; i < clientDeposits.size(); i++)
+                System.out.println((i + 1) + ") " + clientDeposits.get(i));
+        }
+    }
+
     public void informatiiDepozit() {
         if (selectedDeposit != null) {
             selectedDeposit.extras();
@@ -94,8 +105,8 @@ public class DepositService implements IDatabaseOperations<Deposit> {
         Double balance = Numeric.getBalance(scan, MAX_DEPOSIT_BALANCE);
         String type = printAndGetType();
         Double dobanda = typeDobanda.get(type);
-        Integer id = deposits.size() == 0 ? 1 : deposits.get(deposits.size() - 1).getID() + 1;
-        Deposit newDeposit = new Deposit(id, cls.getCurrentClient(), currency, dobanda, type, balance);
+        int id = create(new Deposit(-1, cls.getCurrentClient(), currency, dobanda, type, balance, LocalDateTime.now(), LocalDateTime.now().plusYears(1)));
+        Deposit newDeposit = read(id);
         clientDeposits.add(newDeposit);
         deposits.add(newDeposit);
         System.out.println("Depositul a fost deschis cu succes!");
@@ -112,6 +123,7 @@ public class DepositService implements IDatabaseOperations<Deposit> {
         }
         clientDeposits.remove(selectedDeposit);
         deposits.remove(selectedDeposit);
+        delete(selectedDeposit.getID());
         selectedDeposit = null;
         System.out.println("Depositul a fost sters cu succes");
     }
@@ -137,17 +149,9 @@ public class DepositService implements IDatabaseOperations<Deposit> {
     public List<Deposit> getCollection() { return deposits; }
 
     @Override
-    public void load(List<Deposit> deposits) {
-        this.deposits = deposits;
-        typeDobanda = new HashMap<>();
-        try {
-            List<String[]> data = CSVReader.getInstance().readFile(Paths.get(System.getProperty("user.dir"), "src", "database", "data", "DepositsDobanda.csv").toString());
-            for (String[] line: data) {
-                typeDobanda.put(line[0], Double.parseDouble(line[1]));
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    public void load() {
+        this.deposits = readAll();
+        this.typeDobanda = readDepositDobanda();
     }
 
     @Override
@@ -160,7 +164,9 @@ public class DepositService implements IDatabaseOperations<Deposit> {
         Double dobanda = Double.parseDouble(dbRow[3]);
         String type = dbRow[4];
         Double sumaDepusa = Double.parseDouble(dbRow[5]);
-        return new Deposit(id, client, currency, dobanda, type, sumaDepusa);
+        LocalDateTime creationDate = LocalDateTime.parse(dbRow[6]);
+        LocalDateTime expirationDate = LocalDateTime.parse(dbRow[7]);
+        return new Deposit(id, client, currency, dobanda, type, sumaDepusa, creationDate, expirationDate);
     }
 
     @Override
@@ -171,7 +177,9 @@ public class DepositService implements IDatabaseOperations<Deposit> {
                 obj.getAccountCurrency().getID().toString(),
                 obj.getDobanda().toString(),
                 obj.getType(),
-                obj.getSumaDepusa().toString()
+                obj.getSumaDepusa().toString(),
+                obj.getCreationDate().toString(),
+                obj.getExpirationDate().toString()
         };
     }
 
@@ -194,5 +202,116 @@ public class DepositService implements IDatabaseOperations<Deposit> {
                         .filter(deposit -> deposit.getClient().getID().equals(clientID))
                         .collect(Collectors.toList());
         return clDeposits;
+    }
+
+    /* CRUD Operations */
+    @Override
+    public int create(Deposit obj) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String insertQuery = "insert into deposit values (null, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, obj.getClient().getID());
+            preparedStatement.setInt(2, obj.getAccountCurrency().getID());
+            preparedStatement.setDouble(3, obj.getDobanda());
+            preparedStatement.setString(4, obj.getType());
+            preparedStatement.setDouble(5, obj.getSumaDepusa());
+            preparedStatement.setString(6, obj.getCreationDate().toString());
+            preparedStatement.setString(7, obj.getExpirationDate().toString());
+
+            preparedStatement.executeUpdate();
+            ResultSet genKeys = preparedStatement.getGeneratedKeys();
+            int id = -1;
+            if (genKeys.next()) id = genKeys.getInt(1);
+            preparedStatement.close();
+
+            return id;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @DepositService/create: " + sqle.getMessage());
+            return -1;
+        }
+    }
+
+    @Override
+    public List<Deposit> readAll() {
+        List<Deposit> databaseDeposits = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String selectQuery = "select id from deposit";
+            ResultSet queryResult = connection.prepareStatement(selectQuery).executeQuery();
+            while (queryResult.next()) {
+                int id = queryResult.getInt("id");
+                databaseDeposits.add(read(id));
+            }
+            return databaseDeposits;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @DepositService/readALl: " + sqle.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public Deposit read(int depositId) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword())) {
+            String selectQuery = "select * from deposit where id =" + Integer.toString(depositId);
+            ResultSet queryResult = connection.prepareStatement(selectQuery).executeQuery();
+            Deposit deposit = null;
+            while (queryResult.next()) {
+                int id = queryResult.getInt("id");
+                int clientID = queryResult.getInt("clientID");
+                int currencyID = queryResult.getInt("currencyID");
+                Double dobanda = queryResult.getDouble("dobanda");
+                String type = queryResult.getString("type");
+                Double sumaDepusa = queryResult.getDouble("sumaDepusa");
+                LocalDateTime creationDate = LocalDateTime.parse(queryResult.getString("creationDate"));
+                LocalDateTime expirationDate = LocalDateTime.parse(queryResult.getString("expirationDate"));
+
+                Client client = ClientService.getInstance().getElementById(clientID);
+                Currency currency = CurrencyService.getInstance().getElementById(currencyID);
+                deposit = new Deposit(id, client, currency, dobanda, type, sumaDepusa, creationDate, expirationDate);
+            }
+            return deposit;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @DepositService/read: " + sqle.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public void update(int id, Deposit newObj) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword());
+             Statement statement = connection.createStatement()) {
+            String updateQuery = "update deposit set expirationDate = " + newObj.getExpirationDate().toString() + " where id = " + id;
+            statement.executeUpdate(updateQuery);
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @DepositService/update: " + sqle.getMessage());
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword());
+             Statement statement = connection.createStatement()) {
+            String deleteQuery = "delete from deposit where id = " + id;
+            statement.executeUpdate(deleteQuery);
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @DepositService/delete: " + sqle.getMessage());
+        }
+    }
+
+    public HashMap<String, Double> readDepositDobanda() {
+        try (Connection connection = DriverManager.getConnection(Database.getInstance().getUrl(), Database.getInstance().getUser(), Database.getInstance().getPassword());
+             Statement statement = connection.createStatement()) {
+            HashMap<String, Double> databaseDepositDobanda = new HashMap<>();
+            String selectQuery = "select * from depositsdobanda";
+            ResultSet result = statement.executeQuery(selectQuery);
+            while (result.next()) {
+                String name = result.getString("name");
+                Double dobanda = result.getDouble("dobanda");
+                databaseDepositDobanda.put(name, dobanda);
+            }
+            return databaseDepositDobanda;
+        } catch (SQLException sqle) {
+            System.out.println("SQL Exception @DepositService/readDepositDobanda: " + sqle.getMessage());
+            return null;
+        }
     }
 }

@@ -12,8 +12,8 @@ public class Credit extends Contract implements Comparable<Credit> {
     private Double sumaDeRestituit;
     private LocalDateTime closingDate;
 
-    public Credit(Integer id, Client client, Currency accountCurrency, Double dobanda, String type, Double sumaImprumutata, Double sumaRestituita) {
-        super(id, client, accountCurrency, dobanda, type, "Pending approval. Wait for an employee to approve your request");
+    public Credit(Integer id, Client client, Currency accountCurrency, Double dobanda, String type, Double sumaImprumutata, Double sumaRestituita, LocalDateTime creationDate) {
+        super(id, client, accountCurrency, dobanda, type, "Open", creationDate);
         this.sumaImprumutata = sumaImprumutata;
         this.sumaRestituita = sumaRestituita;
         this.sumaDeRestituit = sumaImprumutata * (1 + dobanda);
@@ -65,14 +65,19 @@ public class Credit extends Contract implements Comparable<Credit> {
     }
 
     @Override
+    public String toString() {
+        return "Credit bancar, client: " + client.getName() + ", Suma imprumutata: " + sumaImprumutata + ", Valuta: " + accountCurrency.getFullName();
+    }
+
+    @Override
     public void extras() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter ft = DateTimeFormatter.ofPattern("dd.MM.yyyy, kk:mm");
         System.out.println("Extras pentru creditul clientului " + client.getName() + " de la data de " + ft.format(now));
         System.out.println("Suma imprumutata: " + sumaImprumutata + " " + accountCurrency.getName() + " (" + accountCurrency.getInternational() + ")");
         System.out.println("Suma restituita pana acum: " + sumaRestituita + " " + accountCurrency.getName() + " (" + accountCurrency.getInternational() + ")");
-        System.out.println("Suma totala pentru restituire: " + sumaImprumutata + " " + accountCurrency.getName() + " (" + accountCurrency.getInternational() + ")");
-        System.out.println("Rata dobanzii: " + dobanda * 100 + "%");
+        System.out.println("Suma totala pentru restituire: " + sumaDeRestituit + " " + accountCurrency.getName() + " (" + accountCurrency.getInternational() + ")");
+        System.out.println("Rata dobanzii: " + dobanda + "%");
         System.out.println("Tipul creditului: " + type);
         // Tranzactii
     }

@@ -4,19 +4,16 @@ import features.Currency;
 import features.ExchangeCurrency;
 import services.*;
 
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
 public class Database {
     private static Database dbInstance = null;
-    private CSVReader reader;
-    private CSVWriter writer;
+    private final String url = "jdbc:mysql://localhost:3306/ubermenschdb";
+    private final String user = "root";
+    private final String password = "351963";
 
-    private Database() {
-        reader = CSVReader.getInstance();
-        writer = CSVWriter.getInstance();
-    }
+    private Database() { }
 
     public static Database getInstance() {
         if (dbInstance == null)
@@ -24,61 +21,40 @@ public class Database {
         return dbInstance;
     }
 
-    private String dbPath(String table) {
-        return Paths.get(System.getProperty("user.dir"), "src", "database", "data", table + ".csv").toString();
+    public String getUrl() {
+        return url;
     }
 
-    private <T> void loadTable(String path, IDatabaseOperations<T> service) {
-        service.load(reader.readData(dbPath(path), service));
+    public String getUser() {
+        return user;
     }
 
-    private <T> void storeTable(String path, IDatabaseOperations<T> service) {
-        writer.writeData(dbPath(path), service.getCollection(), service);
+    public String getPassword() {
+        return password;
     }
 
     public void loadDatabase() {
-        // Load the clients
-        loadTable("Client", ClientService.getInstance());
+        // Load Clients
+        ClientService.getInstance().load();
 
-        // Load the currencies
-        loadTable("Currency", CurrencyService.getInstance());
+        // Load Currencies
+        CurrencyService.getInstance().load();
 
-        // Load the accounts
-        loadTable("Account", AccountService.getInstance());
+        // Load Accounts
+        AccountService.getInstance().load();
 
-        // Load the deposits
-        loadTable("Deposit", DepositService.getInstance());
+        // Load Deposits
+        DepositService.getInstance().load();
 
-        // Load the credits
-        loadTable("Credit", CreditService.getInstance());
+        // Load Credits
+        CreditService.getInstance().load();
 
-        // Load the transactions
-        loadTable("Transaction", TransactionService.getInstance());
+        // Load Transactions
+        TransactionService.getInstance().load();
 
-        // Set Accounts, Deposits, Credits and Transactions for Clients
+        // Set client accounts, deposits, credits
         ClientService.getInstance().setData();
     }
-
-    public void storeDatabase() {
-        // Store clients
-        storeTable("Client", ClientService.getInstance());
-
-        // Store currencies
-        storeTable("Currency", CurrencyService.getInstance());
-
-        // Store accounts
-        storeTable("Account", AccountService.getInstance());
-
-        // Store deposits
-        storeTable("Deposit", DepositService.getInstance());
-
-        // Store credits
-        storeTable("Credit", CreditService.getInstance());
-
-        // Store transactions
-        storeTable("Transaction", TransactionService.getInstance());
-    }
-
 
     public HashMap<ExchangeCurrency, Double> createExchanges() {
         HashMap<ExchangeCurrency, Double> db = new HashMap<>();

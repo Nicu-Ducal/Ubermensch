@@ -8,7 +8,7 @@ import java.util.List;
  */
 public interface IDatabaseOperations<T> {
     List<T> getCollection();
-    void load(List<T> data);
+    void load();
     T toObjectFromDB(String[] dbRow);
     String[] toDBString(T obj);
     T getElementById(Integer id);

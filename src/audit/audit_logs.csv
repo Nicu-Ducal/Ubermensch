@@ -67,3 +67,211 @@ logout,Time: 29.04.2021, 22:18
 login,Time: 29.04.2021, 22:18
 show-info,Time: 29.04.2021, 22:18
 show-transfers,Time: 29.04.2021, 22:18
+register,Time: 10.05.2021, 16:29
+login,Time: 10.05.2021, 16:37
+login,Time: 10.05.2021, 16:37
+show-info,Time: 10.05.2021, 16:38
+open account,Time: 10.05.2021, 16:38
+show-info,Time: 10.05.2021, 16:38
+open deposit,Time: 10.05.2021, 16:45
+login,Time: 10.05.2021, 17:02
+show-info,Time: 10.05.2021, 17:02
+open deposit,Time: 10.05.2021, 17:02
+login,Time: 10.05.2021, 17:07
+show-info,Time: 10.05.2021, 17:07
+open deposit,Time: 10.05.2021, 17:08
+show-info,Time: 10.05.2021, 17:08
+show-account-info,Time: 10.05.2021, 17:08
+open credit,Time: 10.05.2021, 17:09
+show-info,Time: 10.05.2021, 17:09
+show-accounts,Time: 10.05.2021, 17:10
+logout,Time: 10.05.2021, 17:10
+exit,Time: 10.05.2021, 17:10
+register,Time: 10.05.2021, 18:52
+play-theme,Time: 10.05.2021, 18:53
+logout,Time: 10.05.2021, 18:53
+login,Time: 10.05.2021, 18:53
+register,Time: 10.05.2021, 18:53
+logout,Time: 10.05.2021, 18:54
+login,Time: 10.05.2021, 18:54
+change-user-account,Time: 10.05.2021, 18:55
+change-user-account,Time: 10.05.2021, 18:55
+play-theme,Time: 10.05.2021, 18:58
+login,Time: 10.05.2021, 18:58
+change-user-account,Time: 10.05.2021, 18:59
+play-theme,Time: 10.05.2021, 19:05
+login,Time: 10.05.2021, 19:05
+change-user-account,Time: 10.05.2021, 19:05
+change-user-account,Time: 10.05.2021, 19:06
+logout,Time: 10.05.2021, 19:06
+login,Time: 10.05.2021, 19:06
+delete-user-account,Time: 10.05.2021, 19:07
+show-info,Time: 10.05.2021, 19:07
+logout,Time: 10.05.2021, 19:07
+login,Time: 10.05.2021, 19:07
+delete-user-account,Time: 10.05.2021, 19:07
+register,Time: 10.05.2021, 19:09
+login,Time: 10.05.2021, 19:09
+delete-user-account,Time: 10.05.2021, 19:09
+login,Time: 10.05.2021, 19:10
+show-info,Time: 10.05.2021, 19:10
+show account,Time: 10.05.2021, 19:11
+show accounts,Time: 10.05.2021, 19:11
+show deposits,Time: 10.05.2021, 19:11
+show credits,Time: 10.05.2021, 19:11
+open account,Time: 10.05.2021, 19:11
+open deposit,Time: 10.05.2021, 19:12
+show-info,Time: 10.05.2021, 19:12
+open credit,Time: 10.05.2021, 19:12
+show-info,Time: 10.05.2021, 19:12
+show accounts,Time: 10.05.2021, 19:12
+show deposits,Time: 10.05.2021, 19:12
+show credits,Time: 10.05.2021, 19:12
+exit,Time: 10.05.2021, 19:12
+play-theme,Time: 10.05.2021, 19:18
+login,Time: 10.05.2021, 19:19
+login,Time: 10.05.2021, 19:19
+show-info,Time: 10.05.2021, 19:19
+show accounts,Time: 10.05.2021, 19:19
+show deposits,Time: 10.05.2021, 19:19
+show credits,Time: 10.05.2021, 19:19
+close account,Time: 10.05.2021, 19:19
+close deposit,Time: 10.05.2021, 19:19
+close credit,Time: 10.05.2021, 19:19
+select account 1,Time: 10.05.2021, 19:20
+show-account-info,Time: 10.05.2021, 19:20
+add-money 500 EU,Time: 10.05.2021, 19:20
+add-money 500 EUR,Time: 10.05.2021, 19:20
+show-account-info,Time: 10.05.2021, 19:20
+transfer-money,Time: 10.05.2021, 19:21
+show-transfers,Time: 10.05.2021, 19:21
+close account,Time: 10.05.2021, 19:22
+show-info,Time: 10.05.2021, 19:22
+show accounts,Time: 10.05.2021, 19:22
+show-account-info,Time: 10.05.2021, 19:22
+close account,Time: 10.05.2021, 19:22
+select deposit 1,Time: 10.05.2021, 19:22
+show-deposit-info,Time: 10.05.2021, 19:22
+close deposit,Time: 10.05.2021, 19:22
+show-info,Time: 10.05.2021, 19:23
+close deposit,Time: 10.05.2021, 19:23
+show-deposit-info,Time: 10.05.2021, 19:23
+select credit 1,Time: 10.05.2021, 19:23
+show-credit-info,Time: 10.05.2021, 19:24
+close credit,Time: 10.05.2021, 19:24
+pay-credit 5000 GBP,Time: 10.05.2021, 19:24
+pay-credit 5000 USD,Time: 10.05.2021, 19:24
+pay-credit 5000 EUR,Time: 10.05.2021, 19:24
+show-credit-info,Time: 10.05.2021, 19:24
+close credit,Time: 10.05.2021, 19:25
+pay-credit 100000 RON,Time: 10.05.2021, 19:25
+show-credit-info,Time: 10.05.2021, 19:25
+pay-credit 100 EUR,Time: 10.05.2021, 19:25
+login,Time: 10.05.2021, 19:35
+show-info,Time: 10.05.2021, 19:35
+select account 1,Time: 10.05.2021, 19:35
+select account 2,Time: 10.05.2021, 19:35
+select deposit 2,Time: 10.05.2021, 19:35
+select credit 2,Time: 10.05.2021, 19:35
+select credit 1,Time: 10.05.2021, 19:35
+show-credit-info,Time: 10.05.2021, 19:36
+pay-credit 100000 EUR,Time: 10.05.2021, 19:36
+show-credit-info,Time: 10.05.2021, 19:36
+pay-credit 10 RON,Time: 10.05.2021, 19:36
+pay-credit 1000000 EUR,Time: 10.05.2021, 19:36
+pay-credit 50000 EUR,Time: 10.05.2021, 19:37
+close credit,Time: 10.05.2021, 19:37
+open account,Time: 10.05.2021, 19:37
+select account 1,Time: 10.05.2021, 19:38
+show-account-info,Time: 10.05.2021, 19:38
+transfer-money,Time: 10.05.2021, 19:38
+login,Time: 10.05.2021, 19:40
+show accounts,Time: 10.05.2021, 19:40
+show-info,Time: 10.05.2021, 19:40
+select account 1,Time: 10.05.2021, 19:40
+show-account-info,Time: 10.05.2021, 19:41
+transfer-money,Time: 10.05.2021, 19:41
+login,Time: 10.05.2021, 19:44
+show-info,Time: 10.05.2021, 19:45
+select account 1,Time: 10.05.2021, 19:45
+login,Time: 10.05.2021, 19:55
+select account 1,Time: 10.05.2021, 19:55
+show-info,Time: 10.05.2021, 19:55
+transfer-money,Time: 10.05.2021, 19:55
+login,Time: 10.05.2021, 19:57
+select account 1,Time: 10.05.2021, 19:57
+show-account-info,Time: 10.05.2021, 19:57
+transfer-money,Time: 10.05.2021, 19:57
+transfer-money,Time: 10.05.2021, 19:58
+show-transfers,Time: 10.05.2021, 19:58
+exit,Time: 10.05.2021, 19:58
+login,Time: 10.05.2021, 19:58
+show-info,Time: 10.05.2021, 19:59
+show-transfers,Time: 10.05.2021, 19:59
+select account 1,Time: 10.05.2021, 19:59
+show-account-info,Time: 10.05.2021, 19:59
+transfer-money,Time: 10.05.2021, 19:59
+show-transfers,Time: 10.05.2021, 19:59
+close account,Time: 10.05.2021, 20:00
+show-transfers,Time: 10.05.2021, 20:00
+logout,Time: 10.05.2021, 20:00
+login,Time: 10.05.2021, 20:00
+login,Time: 10.05.2021, 20:01
+logout,Time: 10.05.2021, 20:01
+login,Time: 10.05.2021, 20:01
+show accounts,Time: 10.05.2021, 20:01
+show-transfers,Time: 10.05.2021, 20:01
+exit,Time: 10.05.2021, 20:01
+login,Time: 10.05.2021, 20:03
+show-info,Time: 10.05.2021, 20:03
+open account,Time: 10.05.2021, 20:03
+select acount 1,Time: 10.05.2021, 20:03
+select account 1,Time: 10.05.2021, 20:03
+transfer-money,Time: 10.05.2021, 20:04
+transfer-money,Time: 10.05.2021, 20:04
+transfer-money,Time: 10.05.2021, 20:04
+show-transfers,Time: 10.05.2021, 20:04
+close account,Time: 10.05.2021, 20:04
+show-info,Time: 10.05.2021, 20:04
+show-transfers,Time: 10.05.2021, 20:05
+logout,Time: 10.05.2021, 20:05
+login,Time: 10.05.2021, 20:05
+login,Time: 10.05.2021, 20:05
+show-info,Time: 10.05.2021, 20:05
+show-transfers,Time: 10.05.2021, 20:05
+logout,Time: 10.05.2021, 20:05
+login,Time: 10.05.2021, 20:06
+open account,Time: 10.05.2021, 20:06
+select account 1,Time: 10.05.2021, 20:07
+show-account-info,Time: 10.05.2021, 20:07
+show-deposit-info,Time: 10.05.2021, 20:07
+transfer-money,Time: 10.05.2021, 20:08
+show-transfers,Time: 10.05.2021, 20:08
+close account,Time: 10.05.2021, 20:08
+show-info,Time: 10.05.2021, 20:08
+show-transfers,Time: 10.05.2021, 20:08
+open account,Time: 10.05.2021, 20:09
+show-info,Time: 10.05.2021, 20:09
+show-info,Time: 10.05.2021, 20:09
+show accounts,Time: 10.05.2021, 20:09
+show-info,Time: 10.05.2021, 20:09
+login,Time: 10.05.2021, 20:13
+show-info,Time: 10.05.2021, 20:13
+select account 1,Time: 10.05.2021, 20:13
+show-account-info,Time: 10.05.2021, 20:13
+transfer-money,Time: 10.05.2021, 20:13
+show-account-info,Time: 10.05.2021, 20:13
+show-transfers,Time: 10.05.2021, 20:14
+close account,Time: 10.05.2021, 20:14
+show-info,Time: 10.05.2021, 20:14
+show-transfers,Time: 10.05.2021, 20:14
+open account,Time: 10.05.2021, 20:15
+show-info,Time: 10.05.2021, 20:15
+logout,Time: 10.05.2021, 20:15
+login,Time: 10.05.2021, 20:15
+show-info,Time: 10.05.2021, 20:15
+login,Time: 10.05.2021, 20:15
+login,Time: 10.05.2021, 20:16
+show-info,Time: 10.05.2021, 20:16
+show-transfers,Time: 10.05.2021, 20:16
+exit,Time: 10.05.2021, 20:16

@@ -51,7 +51,7 @@ public class Account {
 
     public void withdrawMoney(Double amount) throws Exception {
         if (amount > balance) {
-            throw new Exception("Not enough money on your account");
+            throw new Exception("Nu aveti suficienti bani pe cont pentru a efectua aceasta operatie");
         }
         balance -= amount;
     }

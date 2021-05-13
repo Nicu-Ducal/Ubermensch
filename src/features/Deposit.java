@@ -10,10 +10,10 @@ public class Deposit extends Contract implements Comparable<Deposit> {
     private LocalDateTime expirationDate;
     private Double sumaDepusa;
 
-    public Deposit(Integer id, Client client, Currency accountCurrency, Double dobanda, String type, Double sumaDepusa) {
-        super(id, client, accountCurrency, dobanda, type, "Pending approval. Wait for an employee to approve your request");
+    public Deposit(Integer id, Client client, Currency accountCurrency, Double dobanda, String type, Double sumaDepusa, LocalDateTime creationDate, LocalDateTime expirationDate) {
+        super(id, client, accountCurrency, dobanda, type, "Open", creationDate);
         this.sumaDepusa = sumaDepusa;
-        this.expirationDate = this.creationDate.plusYears(1);
+        this.expirationDate = expirationDate;
     }
 
     public Double getSumaDepusa() {
@@ -46,12 +46,17 @@ public class Deposit extends Contract implements Comparable<Deposit> {
     }
 
     @Override
+    public String toString() {
+        return "Deposit, client: " + client.getName() + ", Suma: " + sumaDepusa + ", Valuta: " + accountCurrency.getFullName();
+    }
+
+    @Override
     public void extras() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter ft = DateTimeFormatter.ofPattern("dd.MM.yyyy, kk:mm");
         System.out.println("Extras pentru depositul clientului " + client.getName() + " de la data de " + ft.format(now));
         System.out.println("Soldul depositului: " + sumaDepusa + " " + accountCurrency.getName() + " (" + accountCurrency.getInternational() + ")");
-        System.out.println("Rata dobanzii: " + dobanda * 100 + "%");
+        System.out.println("Rata dobanzii: " + dobanda + "%");
         System.out.println("Tip deposit: " + type);
         // Tranzactii
     }

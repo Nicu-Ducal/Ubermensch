@@ -16,11 +16,11 @@ public abstract class Contract implements Rate {
     protected LocalDateTime lastBalanceUpdate;
     protected String status;
 
-    public Contract(Integer id, Client client, Currency accountCurrency, Double dobanda, String type, String status) {
+    public Contract(Integer id, Client client, Currency accountCurrency, Double dobanda, String type, String status, LocalDateTime creationDate) {
         this.id = id;
         this.client = client;
         this.accountCurrency = accountCurrency;
-        this.creationDate = LocalDateTime.now();
+        this.creationDate = creationDate;
         this.lastBalanceUpdate = LocalDateTime.now();
         this.dobanda = dobanda;
         this.status = status;
