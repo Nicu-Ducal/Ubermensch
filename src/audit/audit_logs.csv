@@ -275,3 +275,75 @@ login,Time: 10.05.2021, 20:16
 show-info,Time: 10.05.2021, 20:16
 show-transfers,Time: 10.05.2021, 20:16
 exit,Time: 10.05.2021, 20:16
+register,Time: 14.05.2021, 18:45
+login,Time: 14.05.2021, 18:46
+change-user-account,Time: 14.05.2021, 18:46
+logout,Time: 14.05.2021, 18:46
+login,Time: 14.05.2021, 18:47
+logout,Time: 14.05.2021, 18:50
+login,Time: 14.05.2021, 18:51
+show-info,Time: 14.05.2021, 18:51
+open account,Time: 14.05.2021, 18:51
+open deposit,Time: 14.05.2021, 18:51
+open credits,Time: 14.05.2021, 18:52
+open credit,Time: 14.05.2021, 18:52
+show-info,Time: 14.05.2021, 18:52
+delete-user-account,Time: 14.05.2021, 18:52
+show deposits,Time: 14.05.2021, 18:52
+select deposit 1,Time: 14.05.2021, 18:53
+show-deposit-info,Time: 14.05.2021, 18:53
+close deposit,Time: 14.05.2021, 18:53
+show-info,Time: 14.05.2021, 18:53
+show-deposit-info,Time: 14.05.2021, 18:54
+show credits,Time: 14.05.2021, 18:54
+select credit 1,Time: 14.05.2021, 18:54
+show-credit-info,Time: 14.05.2021, 18:54
+login,Time: 14.05.2021, 18:55
+show-info,Time: 14.05.2021, 18:56
+open credit,Time: 14.05.2021, 18:56
+show credits,Time: 14.05.2021, 18:56
+select credit 2,Time: 14.05.2021, 18:56
+show-credit-info,Time: 14.05.2021, 18:56
+select credit 1,Time: 14.05.2021, 18:56
+show-credit-info,Time: 14.05.2021, 18:56
+pay-credit 1000 EUR,Time: 14.05.2021, 18:57
+pay-credit 10000 EUR,Time: 14.05.2021, 18:58
+show-credit-info,Time: 14.05.2021, 18:58
+pay-credit 12500 USD,Time: 14.05.2021, 18:58
+show-credit-info,Time: 14.05.2021, 18:58
+pay-credit 10 USD,Time: 14.05.2021, 18:58
+close credit,Time: 14.05.2021, 18:58
+show-info,Time: 14.05.2021, 18:58
+show creedits,Time: 14.05.2021, 18:58
+show credits,Time: 14.05.2021, 18:59
+select credit 1,Time: 14.05.2021, 18:59
+show-credit-info,Time: 14.05.2021, 18:59
+close credeit,Time: 14.05.2021, 18:59
+close credit,Time: 14.05.2021, 18:59
+pay-credit 102000 EUR,Time: 14.05.2021, 19:00
+show-credit-info,Time: 14.05.2021, 19:00
+pay-credit 10 EUR,Time: 14.05.2021, 19:00
+close credit,Time: 14.05.2021, 19:00
+show-info,Time: 14.05.2021, 19:00
+select account 1,Time: 14.05.2021, 19:00
+show-account-info,Time: 14.05.2021, 19:00
+transfer-money,Time: 14.05.2021, 19:01
+show-transfers,Time: 14.05.2021, 19:01
+transfer-money,Time: 14.05.2021, 19:02
+show-transfers,Time: 14.05.2021, 19:02
+show-account-info,Time: 14.05.2021, 19:02
+close account,Time: 14.05.2021, 19:02
+show-info,Time: 14.05.2021, 19:02
+show-transfers,Time: 14.05.2021, 19:02
+open account,Time: 14.05.2021, 19:03
+select account 1,Time: 14.05.2021, 19:03
+show-account-info,Time: 14.05.2021, 19:03
+withdraw-money 10001 RON,Time: 14.05.2021, 19:03
+withdraw-money 1000 USD,Time: 14.05.2021, 19:04
+withdraw-money 1000 EUR,Time: 14.05.2021, 19:04
+show-account-info,Time: 14.05.2021, 19:04
+add-money 1000 EUR,Time: 14.05.2021, 19:04
+show-account-info,Time: 14.05.2021, 19:04
+close account,Time: 14.05.2021, 19:04
+delete-user-account,Time: 14.05.2021, 19:04
+exit,Time: 14.05.2021, 19:05

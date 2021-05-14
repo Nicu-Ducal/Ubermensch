@@ -4,10 +4,6 @@ Aplicatie bancara realizata in Java, utilizand concepte de Programare Orientată
 
 ## TODO
 1. Să adaug Exceptii custom
-2. Să completez funcționalitatea clasei ```BankApp``` la rularea aplicatiei.
-3. Să adaug GET Requests/Fetch catre un API care sa-mi permita sa colectez informatii despre exchange rates
-ale valutelor din `Currency`
-4. Partea III a proiectului + CRUD pe 4 clase (Client, Account, Deposit?, Credit?)
    
 ### Descrierea aplicației
 Utilizatorii aplicației pot fi clienți ai băncii sau angajații acesteia. Mai întâi, pentru a efectua
@@ -105,3 +101,12 @@ public class AuditService;
 ```
 Surse ajutătoare: 
 * CSV Read and Write Operations - `https://stackabuse.com/reading-and-writing-csvs-in-java/`
+
+### Cerințe pentru etapa a III-a
+1. Înlocuiți serviciile realizate în etapa a II-a cu servicii care să asigure persistența utilizând baza de date
+folosind JDBC
+2. Să se realizeze servicii care să expuncă operații de tip create, read, update, delete pentru cele puțin 4 dintre
+clasele definite
+```java
+public interface CRUD<T>
+```

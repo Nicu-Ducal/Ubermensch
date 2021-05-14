@@ -16,7 +16,7 @@ public class Credit extends Contract implements Comparable<Credit> {
         super(id, client, accountCurrency, dobanda, type, "Open", creationDate);
         this.sumaImprumutata = sumaImprumutata;
         this.sumaRestituita = sumaRestituita;
-        this.sumaDeRestituit = sumaImprumutata * (1 + dobanda);
+        this.sumaDeRestituit = sumaImprumutata * (1 + dobanda / 100.0);
     }
 
     public Double getSumaImprumutata() {
